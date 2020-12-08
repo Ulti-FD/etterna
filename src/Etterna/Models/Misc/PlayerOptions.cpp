@@ -1714,20 +1714,14 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 
 	LunaPlayerOptions()
 	{
-		ADD_METHOD(IsEasierForSongAndSteps);
-
-		ADD_METHOD(LifeSetting);
-		ADD_METHOD(DrainSetting);
-		ADD_METHOD(BatteryLives);
-		ADD_METHOD(TimeSpacing);
-		ADD_METHOD(MaxScrollBPM);
-		ADD_METHOD(ScrollSpeed);
-		ADD_METHOD(ScrollBPM);
+		// Accel 
 		ADD_METHOD(Boost);
 		ADD_METHOD(Brake);
 		ADD_METHOD(Wave);
 		ADD_METHOD(Expand);
 		ADD_METHOD(Boomerang);
+
+		// Effect
 		ADD_METHOD(Drunk);
 		ADD_METHOD(Dizzy);
 		ADD_METHOD(Confusion);
@@ -1742,6 +1736,8 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Xmode);
 		ADD_METHOD(Twirl);
 		ADD_METHOD(Roll);
+
+		// Appearance
 		ADD_METHOD(Hidden);
 		ADD_METHOD(HiddenOffset);
 		ADD_METHOD(Sudden);
@@ -1749,21 +1745,20 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Stealth);
 		ADD_METHOD(Blink);
 		ADD_METHOD(RandomVanish);
+
+		// Scroll
 		ADD_METHOD(Reverse);
 		ADD_METHOD(Split);
 		ADD_METHOD(Alternate);
 		ADD_METHOD(Cross);
 		ADD_METHOD(Centered);
+
+		// Hide
 		ADD_METHOD(Dark);
 		ADD_METHOD(Blind);
 		ADD_METHOD(Cover);
-		ADD_METHOD(RandAttack);
-		ADD_METHOD(NoAttack);
-		ADD_METHOD(PlayerAutoPlay);
-		ADD_METHOD(Tilt);
-		ADD_METHOD(Skew);
-		ADD_METHOD(Passmark);
-		ADD_METHOD(RandomSpeed);
+
+		// Transform
 		ADD_METHOD(TurnNone);
 		ADD_METHOD(Mirror);
 		ADD_METHOD(Backwards);
@@ -1798,31 +1793,51 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(NoFakes);
 		ADD_METHOD(NoQuads);
 		ADD_METHOD(NoStretch);
-		ADD_METHOD(MuteOnError);
-		// ADD_METHOD(PracticeMode); -- To Restrict theme access to practice
-		// mode
-		ADD_METHOD(UsingPractice);
-
-		ADD_METHOD(NoteSkin);
-		ADD_METHOD(FailSetting);
-		ADD_METHOD(MinTNSToHideNotes);
 
 		// Speed
 		ADD_METHOD(CMod);
 		ADD_METHOD(XMod);
 		ADD_METHOD(MMod);
+		ADD_METHOD(TimeSpacing);
+		ADD_METHOD(MaxScrollBPM);
+		ADD_METHOD(ScrollSpeed);
+		ADD_METHOD(ScrollBPM);
 
+		// Perspective
 		ADD_METHOD(Overhead);
 		ADD_METHOD(Incoming);
 		ADD_METHOD(Space);
 		ADD_METHOD(Hallway);
 		ADD_METHOD(Distant);
 
+		// Uhhh
+		ADD_METHOD(RandAttack);
+		ADD_METHOD(NoAttack);
+		ADD_METHOD(PlayerAutoPlay);
+		ADD_METHOD(Tilt);
+		ADD_METHOD(Skew);
+		ADD_METHOD(Passmark);
+		ADD_METHOD(RandomSpeed);
+
+		// Misc
+		ADD_METHOD(LifeSetting);
+		ADD_METHOD(DrainSetting);
+		ADD_METHOD(BatteryLives);
+		ADD_METHOD(FailSetting);
+
+		ADD_METHOD(MuteOnError);
+
+		ADD_METHOD(NoteSkin);
+		ADD_METHOD(MinTNSToHideNotes);
+
 		ADD_METHOD(UsingReverse);
 		ADD_METHOD(GetReversePercentForColumn);
 		ADD_METHOD(GetStepAttacks);
+		ADD_METHOD(IsEasierForSongAndSteps);
 		ADD_METHOD(ContainsTransformOrTurn);
 		ADD_METHOD(GetInvalidatingMods);
+		// ADD_METHOD(PracticeMode); -- Restrict theme access to practice mode
+		ADD_METHOD(UsingPractice);
 
 		ADD_METHOD(FromString);
 	}
