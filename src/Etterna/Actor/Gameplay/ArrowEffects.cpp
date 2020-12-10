@@ -120,6 +120,15 @@ GetNoteFieldHeight()
 	return SCREEN_HEIGHT + fabsf(curr_options->m_fPerspectiveTilt) * 200;
 }
 
+static float
+SelectTanType(float angle, bool is_cosec)
+{
+	if (is_cosec)
+		return RageFastCsc(angle);
+	else
+		return RageFastTan(angle);
+}
+
 namespace {
 struct PerPlayerData
 {
@@ -130,6 +139,7 @@ struct PerPlayerData
 	float m_tipsy_offset_result[MAX_COLS_PER_PLAYER];
 	float m_fBeatFactor;
 	float m_fExpandSeconds;
+	float m_fTanExpandSeconds;
 };
 PerPlayerData g_EffectData;
 } // namespace;
@@ -146,12 +156,18 @@ ArrowEffects::Update()
 	const auto field_zoom = GAMESTATE->m_pPlayerState->m_NotefieldZoom;
 	const float* effects =
 	  GAMESTATE->m_pPlayerState->m_PlayerOptions.GetCurrent().m_fEffects;
+	const float* accels =
+	  GAMESTATE->m_pPlayerState->m_PlayerOptions.GetCurrent().m_fAccels;
 
 	auto& data = g_EffectData;
 
 	if (!position.m_bFreeze || !position.m_bDelay) {
 		data.m_fExpandSeconds += fTime - fLastTime;
 		data.m_fExpandSeconds = fmodf(data.m_fExpandSeconds, PI * 2);
+		data.m_fTanExpandSeconds += fTime - fLastTime;
+		data.m_fTanExpandSeconds = fmodf(
+		  data.m_fTanExpandSeconds,
+		  (PI * 2) / (accels[PlayerOptions::ACCEL_TAN_EXPAND_PERIOD] + 1));
 	}
 
 	// Update Tornado
@@ -408,8 +424,11 @@ ArrowEffects::GetYOffset(const PlayerState* pPlayerState,
 		fYAdjust += fBrakeYAdjust;
 	}
 	if (fAccels[PlayerOptions::ACCEL_WAVE] != 0)
-		fYAdjust += fAccels[PlayerOptions::ACCEL_WAVE] * WAVE_MOD_MAGNITUDE *
-					RageFastSin(fYOffset / WAVE_MOD_HEIGHT);
+		fYAdjust +=
+		  fAccels[PlayerOptions::ACCEL_WAVE] * WAVE_MOD_MAGNITUDE *
+		  RageFastSin(fYOffset / ((fAccels[PlayerOptions::ACCEL_WAVE_PERIOD] *
+								   WAVE_MOD_HEIGHT) +
+								  WAVE_MOD_HEIGHT));
 
 	fYOffset += fYAdjust;
 
@@ -456,6 +475,24 @@ ArrowEffects::GetYOffset(const PlayerState* pPlayerState,
 							  EXPAND_SPEED_SCALE_FROM_HIGH,
 							  EXPAND_SPEED_SCALE_TO_LOW,
 							  fExpandMultiplier);
+	}
+
+	if (fAccels[PlayerOptions::ACCEL_TAN_EXPAND] != 0) {
+		auto& data = g_EffectData;
+
+		const auto fTanExpandMultiplier = SCALE(
+		  SelectTanType(data.m_fTanExpandSeconds * EXPAND_MULTIPLIER_FREQUENCY *
+						  (fAccels[PlayerOptions::ACCEL_TAN_EXPAND_PERIOD] + 1),
+						curr_options->m_bCosecant),
+		  EXPAND_MULTIPLIER_SCALE_FROM_LOW,
+		  EXPAND_MULTIPLIER_SCALE_FROM_HIGH,
+		  EXPAND_MULTIPLIER_SCALE_TO_LOW,
+		  EXPAND_MULTIPLIER_SCALE_TO_HIGH);
+		fScrollSpeed *= SCALE(fAccels[PlayerOptions::ACCEL_TAN_EXPAND],
+							  EXPAND_SPEED_SCALE_FROM_LOW,
+							  EXPAND_SPEED_SCALE_FROM_HIGH,
+							  EXPAND_SPEED_SCALE_TO_LOW,
+							  fTanExpandMultiplier);
 	}
 
 	fYOffset *= fScrollSpeed;

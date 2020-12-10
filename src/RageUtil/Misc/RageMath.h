@@ -124,6 +124,10 @@ auto
 RageFastSin(float x) -> float CONST_FUNCTION;
 auto
 RageFastCos(float x) -> float CONST_FUNCTION;
+auto
+RageFastTan(float x) -> float CONST_FUNCTION;
+auto
+RageFastCsc(float x) -> float CONST_FUNCTION;
 
 class RageQuadratic
 {

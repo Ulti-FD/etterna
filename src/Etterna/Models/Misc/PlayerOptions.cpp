@@ -98,6 +98,7 @@ PlayerOptions::Init()
 	m_bMuteOnError = false;
 	m_bPractice = false;
 	m_sNoteSkin = "";
+	m_bCosecant = false;
 }
 
 void
@@ -144,6 +145,7 @@ PlayerOptions::Approach(const PlayerOptions& other, float fDeltaSeconds)
 	DO_COPY(m_FailType);
 	DO_COPY(m_MinTNSToHideNotes);
 	DO_COPY(m_sNoteSkin);
+	DO_COPY(m_bCosecant);
 #undef APPROACH
 #undef DO_COPY
 }
@@ -222,7 +224,11 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fAccels[ACCEL_BOOST], "Boost");
 	AddPart(AddTo, m_fAccels[ACCEL_BRAKE], "Brake");
 	AddPart(AddTo, m_fAccels[ACCEL_WAVE], "Wave");
+	AddPart(AddTo, m_fAccels[ACCEL_WAVE_PERIOD], "WavePeriod");
 	AddPart(AddTo, m_fAccels[ACCEL_EXPAND], "Expand");
+	AddPart(AddTo, m_fAccels[ACCEL_EXPAND_PERIOD], "ExpandPeriod");
+	AddPart(AddTo, m_fAccels[ACCEL_TAN_EXPAND], "TanExpand");
+	AddPart(AddTo, m_fAccels[ACCEL_TAN_EXPAND_PERIOD], "TanExpandPeriod");
 	AddPart(AddTo, m_fAccels[ACCEL_BOOMERANG], "Boomerang");
 
 	AddPart(AddTo, m_fEffects[EFFECT_DRUNK], "Drunk");
@@ -266,6 +272,8 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fPassmark, "Passmark");
 
 	AddPart(AddTo, m_fRandomSpeed, "RandomSpeed");
+
+	AddPart(AddTo, m_bCosecant, "Cosecant");
 
 	if (m_bTurns[TURN_MIRROR])
 		AddTo.push_back("Mirror");
@@ -552,11 +560,22 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 		SET_FLOAT(fAccels[ACCEL_BOOST])
 	else if (sBit == "brake" || sBit == "land")
 		SET_FLOAT(fAccels[ACCEL_BRAKE])
-	else if (sBit == "wave")
-		SET_FLOAT(fAccels[ACCEL_WAVE])
-	else if (sBit == "expand" || sBit == "dwiwave")
-		SET_FLOAT(fAccels[ACCEL_EXPAND])
-	else if (sBit == "boomerang")
+	else if (sBit.find("wave") != sBit.npos) {
+		if (sBit == "wave")
+			SET_FLOAT(fAccels[ACCEL_WAVE])
+		else if (sBit == "waveperiod")
+			SET_FLOAT(fAccels[ACCEL_WAVE_PERIOD])
+	} else if ((sBit.find("expand") != sBit.npos) ||
+			   (sBit.find("dwiwave") != sBit.npos)) {
+		if (sBit == "expand" || sBit == "dwiwave")
+			SET_FLOAT(fAccels[ACCEL_EXPAND])
+		else if (sBit == "expandperiod")
+			SET_FLOAT(fAccels[ACCEL_EXPAND_PERIOD])
+		else if (sBit == "tanexpand")
+			SET_FLOAT(fAccels[ACCEL_TAN_EXPAND])
+		else if (sBit == "tanexpandperiod")
+			SET_FLOAT(fAccels[ACCEL_TAN_EXPAND_PERIOD])
+	} else if (sBit == "boomerang")
 		SET_FLOAT(fAccels[ACCEL_BOOMERANG])
 	else if (sBit == "drunk")
 		SET_FLOAT(fEffects[EFFECT_DRUNK])
@@ -740,6 +759,8 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 		ChooseRandomModifiers();
 	else if (sBit == "practicemode")
 		m_bPractice = on;
+	else if (sBit == "cosecant")
+		m_bCosecant = on;
 	// deprecated mods/left in for compatibility
 	else if (sBit == "converge")
 		SET_FLOAT(fScrolls[SCROLL_CENTERED])
@@ -988,6 +1009,7 @@ PlayerOptions::operator==(const PlayerOptions& other) const
 	COMPARE(m_FailType);
 	COMPARE(m_MinTNSToHideNotes);
 	COMPARE(m_bMuteOnError);
+	COMPARE(m_bCosecant);
 	COMPARE(m_fDark);
 	COMPARE(m_fBlind);
 	COMPARE(m_fCover);
@@ -1039,6 +1061,7 @@ PlayerOptions::operator=(PlayerOptions const& other)
 	CPY(m_FailType);
 	CPY(m_MinTNSToHideNotes);
 	CPY(m_bMuteOnError);
+	CPY(m_bCosecant);
 	CPY_SPEED(fDark);
 	CPY_SPEED(fBlind);
 	CPY_SPEED(fCover);
@@ -1346,7 +1369,15 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(Boost, Accels[PlayerOptions::ACCEL_BOOST], true);
 	FLOAT_INTERFACE(Brake, Accels[PlayerOptions::ACCEL_BRAKE], true);
 	FLOAT_INTERFACE(Wave, Accels[PlayerOptions::ACCEL_WAVE], true);
+	FLOAT_INTERFACE(WavePeriod, Accels[PlayerOptions::ACCEL_WAVE_PERIOD], true);
 	FLOAT_INTERFACE(Expand, Accels[PlayerOptions::ACCEL_EXPAND], true);
+	FLOAT_INTERFACE(ExpandPeriod,
+					Accels[PlayerOptions::ACCEL_EXPAND_PERIOD],
+					true);
+	FLOAT_INTERFACE(TanExpand, Accels[PlayerOptions::ACCEL_TAN_EXPAND], true);
+	FLOAT_INTERFACE(TanExpandPeriod,
+					Accels[PlayerOptions::ACCEL_TAN_EXPAND_PERIOD],
+					true);
 	FLOAT_INTERFACE(Boomerang, Accels[PlayerOptions::ACCEL_BOOMERANG], true);
 	FLOAT_INTERFACE(Drunk, Effects[PlayerOptions::EFFECT_DRUNK], true);
 	FLOAT_INTERFACE(Dizzy, Effects[PlayerOptions::EFFECT_DIZZY], true);
@@ -1404,6 +1435,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 											   // expects the result they get.
 											   // -Kyz
 	FLOAT_INTERFACE(RandomSpeed, RandomSpeed, true);
+	BOOL_INTERFACE(Cosecant, Cosecant);
 	BOOL_INTERFACE(TurnNone, Turns[PlayerOptions::TURN_NONE]);
 	BOOL_INTERFACE(Mirror, Turns[PlayerOptions::TURN_MIRROR]);
 	BOOL_INTERFACE(Backwards, Turns[PlayerOptions::TURN_BACKWARDS]);
@@ -1714,14 +1746,16 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 
 	LunaPlayerOptions()
 	{
-		// Accel 
 		ADD_METHOD(Boost);
 		ADD_METHOD(Brake);
 		ADD_METHOD(Wave);
+		ADD_METHOD(WavePeriod);
 		ADD_METHOD(Expand);
+		ADD_METHOD(ExpandPeriod);
+		ADD_METHOD(TanExpand);
+		ADD_METHOD(TanExpandPeriod);
 		ADD_METHOD(Boomerang);
 
-		// Effect
 		ADD_METHOD(Drunk);
 		ADD_METHOD(Dizzy);
 		ADD_METHOD(Confusion);
@@ -1737,7 +1771,6 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Twirl);
 		ADD_METHOD(Roll);
 
-		// Appearance
 		ADD_METHOD(Hidden);
 		ADD_METHOD(HiddenOffset);
 		ADD_METHOD(Sudden);
@@ -1746,19 +1779,18 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Blink);
 		ADD_METHOD(RandomVanish);
 
-		// Scroll
 		ADD_METHOD(Reverse);
 		ADD_METHOD(Split);
 		ADD_METHOD(Alternate);
 		ADD_METHOD(Cross);
 		ADD_METHOD(Centered);
 
-		// Hide
 		ADD_METHOD(Dark);
 		ADD_METHOD(Blind);
 		ADD_METHOD(Cover);
 
-		// Transform
+		ADD_METHOD(Cosecant);
+
 		ADD_METHOD(TurnNone);
 		ADD_METHOD(Mirror);
 		ADD_METHOD(Backwards);
@@ -1794,7 +1826,6 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(NoQuads);
 		ADD_METHOD(NoStretch);
 
-		// Speed
 		ADD_METHOD(CMod);
 		ADD_METHOD(XMod);
 		ADD_METHOD(MMod);
@@ -1803,27 +1834,24 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(ScrollSpeed);
 		ADD_METHOD(ScrollBPM);
 
-		// Perspective
 		ADD_METHOD(Overhead);
 		ADD_METHOD(Incoming);
 		ADD_METHOD(Space);
 		ADD_METHOD(Hallway);
 		ADD_METHOD(Distant);
-
-		// Uhhh
-		ADD_METHOD(RandAttack);
-		ADD_METHOD(NoAttack);
-		ADD_METHOD(PlayerAutoPlay);
 		ADD_METHOD(Tilt);
 		ADD_METHOD(Skew);
-		ADD_METHOD(Passmark);
 		ADD_METHOD(RandomSpeed);
 
-		// Misc
+		ADD_METHOD(RandAttack);
+		ADD_METHOD(NoAttack);
+
+		ADD_METHOD(PlayerAutoPlay);
 		ADD_METHOD(LifeSetting);
 		ADD_METHOD(DrainSetting);
 		ADD_METHOD(BatteryLives);
 		ADD_METHOD(FailSetting);
+		ADD_METHOD(Passmark);
 
 		ADD_METHOD(MuteOnError);
 

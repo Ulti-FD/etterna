@@ -53,6 +53,7 @@ class PlayerOptions
 	 * This code was taken from Init() to use proper initialization. */
 	PlayerOptions()
 	  : m_MinTNSToHideNotes(PREFSMAN->m_MinTNSToHideNotes)
+	  , m_bCosecant(false)
 	{
 		m_sNoteSkin = "";
 		ZERO(m_fAccels);
@@ -117,7 +118,11 @@ class PlayerOptions
 		ACCEL_BRAKE, /**< The arrows start fast, then slow down as they approach
 						the targets. */
 		ACCEL_WAVE,
+		ACCEL_WAVE_PERIOD,
 		ACCEL_EXPAND,
+		ACCEL_EXPAND_PERIOD,
+		ACCEL_TAN_EXPAND,
+		ACCEL_TAN_EXPAND_PERIOD,
 		ACCEL_BOOMERANG, /**< The arrows start from above the targets, go down,
 							then come back up. */
 		NUM_ACCELS
@@ -261,6 +266,7 @@ class PlayerOptions
 	bool m_bTransforms[NUM_TRANSFORMS]{};
 	bool m_bMuteOnError{ false };
 	bool m_bPractice{ false };
+	bool m_bCosecant{ false };
 	/** @brief The method for which a player can fail a song. */
 	FailType m_FailType{ FailType_Immediate };
 	TapNoteScore m_MinTNSToHideNotes;

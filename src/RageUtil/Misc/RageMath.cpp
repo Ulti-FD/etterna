@@ -848,6 +848,18 @@ RageFastCos(float x)
 }
 
 float
+RageFastTan(float x)
+{
+	return RageFastSin(x) / RageFastCos(x);
+}
+
+float
+RageFastCsc(float x)
+{
+	return 1 / RageFastSin(x);
+}
+
+float
 RageQuadratic::Evaluate(float fT) const
 {
 	// optimized (m_fA * fT*fT*fT) + (m_fB * fT*fT) + (m_fC * fT) + m_fD;
