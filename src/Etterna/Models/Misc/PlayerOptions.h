@@ -53,8 +53,10 @@ class PlayerOptions
 	 * This code was taken from Init() to use proper initialization. */
 	PlayerOptions()
 	  : m_MinTNSToHideNotes(PREFSMAN->m_MinTNSToHideNotes)
-	  , m_bCosecant(false)
 	{
+		m_bCosecant = false;
+		m_bStealthPastReceptors = false;
+		m_bStealthType = false;
 		m_sNoteSkin = "";
 		ZERO(m_fAccels);
 		ONE(m_SpeedfAccels);
@@ -66,6 +68,8 @@ class PlayerOptions
 		ONE(m_SpeedfScrolls);
 		ZERO(m_bTurns);
 		ZERO(m_bTransforms);
+		ZERO(m_fStealth);
+		ONE(m_SpeedfStealth);
 	};
 	void Init();
 	void Approach(const PlayerOptions& other, float fDeltaSeconds);
@@ -236,16 +240,19 @@ class PlayerOptions
 	  m_SpeedfScrollSpeed{ 1.0F }; // used if !m_bTimeSpacing (xMods)
 	float m_fScrollBPM{ 200 },
 	  m_SpeedfScrollBPM{ 1.0F }; // used if m_bTimeSpacing (CMod)
+
 	float m_fAccels[NUM_ACCELS]{}, m_SpeedfAccels[NUM_ACCELS]{};
 	float m_fEffects[NUM_EFFECTS]{}, m_SpeedfEffects[NUM_EFFECTS]{};
 	float m_fAppearances[NUM_APPEARANCES]{},
 	  m_SpeedfAppearances[NUM_APPEARANCES]{};
 	float m_fScrolls[NUM_SCROLLS]{}, m_SpeedfScrolls[NUM_SCROLLS]{};
+
 	float m_fDark{ 0 }, m_SpeedfDark{ 1.0F };
 	float m_fBlind{ 0 }, m_SpeedfBlind{ 1.0F };
 	float m_fCover{ 0 }, m_SpeedfCover{
 		1.0F
 	}; // hide the background per-player--can't think of a good name
+
 	float m_fRandAttack{ 0 }, m_SpeedfRandAttack{ 1.0F };
 	float m_fNoAttack{ 0 }, m_SpeedfNoAttack{ 1.0F };
 	float m_fPlayerAutoPlay{ 0 }, m_SpeedfPlayerAutoPlay{ 1.0F };
@@ -254,19 +261,21 @@ class PlayerOptions
 	float m_fSkew{ 0 }, m_SpeedfSkew{ 1.0F }; // 0 = vanish point is in center
 											  // of player, 1 = vanish point is
 											  // in center of screen
-
 	/* If this is > 0, then the player must have life above this value at the
 	 * end of the song to pass.  This is independent of SongOptions::m_FailType.
 	 */
 	float m_fPassmark{ 0 }, m_SpeedfPassmark{ 1.0F };
-
 	float m_fRandomSpeed{ 0 }, m_SpeedfRandomSpeed{ 1.0F };
-
 	bool m_bTurns[NUM_TURNS]{};
 	bool m_bTransforms[NUM_TRANSFORMS]{};
 	bool m_bMuteOnError{ false };
 	bool m_bPractice{ false };
+
+	float m_fStealth[16], m_SpeedfStealth[16];
+
 	bool m_bCosecant{ false };
+	bool m_bStealthType{ false };
+	bool m_bStealthPastReceptors{ false };
 	/** @brief The method for which a player can fail a song. */
 	FailType m_FailType{ FailType_Immediate };
 	TapNoteScore m_MinTNSToHideNotes;
@@ -301,5 +310,39 @@ class PlayerOptions
 								 Steps* pSteps,
 								 PlayerNumber pn) const -> bool;
 };
+#define ADD_MULTICOL_METHOD(method_name)                                       \
+	ADD_METHOD(method_name##1);                                                \
+	ADD_METHOD(method_name##2);                                                \
+	ADD_METHOD(method_name##3);                                                \
+	ADD_METHOD(method_name##4);                                                \
+	ADD_METHOD(method_name##5);                                                \
+	ADD_METHOD(method_name##6);                                                \
+	ADD_METHOD(method_name##7);                                                \
+	ADD_METHOD(method_name##8);                                                \
+	ADD_METHOD(method_name##9);                                                \
+	ADD_METHOD(method_name##10);                                               \
+	ADD_METHOD(method_name##11);                                               \
+	ADD_METHOD(method_name##12);                                               \
+	ADD_METHOD(method_name##13);                                               \
+	ADD_METHOD(method_name##14);                                               \
+	ADD_METHOD(method_name##15);                                               \
+	ADD_METHOD(method_name##16);
+#define MULTICOL_FLOAT_INTERFACE(func_name, member, valid)                     \
+	FLOAT_INTERFACE(func_name##1, member[0], valid);                           \
+	FLOAT_INTERFACE(func_name##2, member[1], valid);                           \
+	FLOAT_INTERFACE(func_name##3, member[2], valid);                           \
+	FLOAT_INTERFACE(func_name##4, member[3], valid);                           \
+	FLOAT_INTERFACE(func_name##5, member[4], valid);                           \
+	FLOAT_INTERFACE(func_name##6, member[5], valid);                           \
+	FLOAT_INTERFACE(func_name##7, member[6], valid);                           \
+	FLOAT_INTERFACE(func_name##8, member[7], valid);                           \
+	FLOAT_INTERFACE(func_name##9, member[8], valid);                           \
+	FLOAT_INTERFACE(func_name##10, member[9], valid);                          \
+	FLOAT_INTERFACE(func_name##11, member[10], valid);                         \
+	FLOAT_INTERFACE(func_name##12, member[11], valid);                         \
+	FLOAT_INTERFACE(func_name##13, member[12], valid);                         \
+	FLOAT_INTERFACE(func_name##14, member[13], valid);                         \
+	FLOAT_INTERFACE(func_name##15, member[14], valid);                         \
+	FLOAT_INTERFACE(func_name##16, member[15], valid);
 
 #endif

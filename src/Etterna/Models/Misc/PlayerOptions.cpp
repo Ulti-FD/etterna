@@ -73,6 +73,8 @@ PlayerOptions::Init()
 	ONE(m_SpeedfAppearances);
 	ZERO(m_fScrolls);
 	ONE(m_SpeedfScrolls);
+	ZERO(m_bTurns);
+	ZERO(m_bTransforms);
 	m_fDark = 0;
 	m_SpeedfDark = 1.0f;
 	m_fBlind = 0;
@@ -93,12 +95,14 @@ PlayerOptions::Init()
 	m_SpeedfPassmark = 1.0f;
 	m_fRandomSpeed = 0;
 	m_SpeedfRandomSpeed = 1.0f;
-	ZERO(m_bTurns);
-	ZERO(m_bTransforms);
 	m_bMuteOnError = false;
 	m_bPractice = false;
 	m_sNoteSkin = "";
+	m_bStealthType = false;
+	m_bStealthPastReceptors = false;
 	m_bCosecant = false;
+	ZERO(m_fStealth);
+	ONE(m_SpeedfStealth);
 }
 
 void
@@ -135,7 +139,6 @@ PlayerOptions::Approach(const PlayerOptions& other, float fDeltaSeconds)
 	APPROACH(fSkew);
 	APPROACH(fPassmark);
 	APPROACH(fRandomSpeed);
-
 	DO_COPY(m_bSetScrollSpeed);
 	for (auto i = 0; i < NUM_TURNS; i++)
 		DO_COPY(m_bTurns[i]);
@@ -146,6 +149,10 @@ PlayerOptions::Approach(const PlayerOptions& other, float fDeltaSeconds)
 	DO_COPY(m_MinTNSToHideNotes);
 	DO_COPY(m_sNoteSkin);
 	DO_COPY(m_bCosecant);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fStealth[i]);
+	DO_COPY(m_bStealthType);
+	DO_COPY(m_bStealthPastReceptors);
 #undef APPROACH
 #undef DO_COPY
 }
@@ -261,19 +268,23 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fScrolls[SCROLL_CENTERED], "Centered");
 
 	AddPart(AddTo, m_fDark, "Dark");
-
 	AddPart(AddTo, m_fBlind, "Blind");
 	AddPart(AddTo, m_fCover, "Cover");
 
 	AddPart(AddTo, m_fRandAttack, "RandomAttacks");
 	AddPart(AddTo, m_fNoAttack, "NoAttacks");
 	AddPart(AddTo, m_fPlayerAutoPlay, "PlayerAutoPlay");
-
 	AddPart(AddTo, m_fPassmark, "Passmark");
-
 	AddPart(AddTo, m_fRandomSpeed, "RandomSpeed");
-
 	AddPart(AddTo, m_bCosecant, "Cosecant");
+	AddPart(AddTo, m_bStealthType, "StealthType");
+	AddPart(AddTo, m_bStealthPastReceptors, "StealthPastReceptors");
+
+	for (int i = 0; i < 16; i++) {
+		auto s = ssprintf("Stealth%d", i + 1);
+
+		AddPart(AddTo, m_fStealth[i], s);
+	}
 
 	if (m_bTurns[TURN_MIRROR])
 		AddTo.push_back("Mirror");
@@ -453,6 +464,7 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 			 "The Noteskin Manager must be loaded in order to process mods.");
 
 	auto sBit = make_lower(sOneMod);
+	std::string sMod = "";
 	Trim(sBit);
 
 	/* "drunk"
@@ -613,9 +625,23 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 		SET_FLOAT(fAppearances[APPEARANCE_SUDDEN])
 	else if (sBit == "suddenoffset")
 		SET_FLOAT(fAppearances[APPEARANCE_SUDDEN_OFFSET])
-	else if (sBit == "stealth")
-		SET_FLOAT(fAppearances[APPEARANCE_STEALTH])
-	else if (sBit == "blink")
+	else if (sBit.find("stealth") != sBit.npos) {
+		if (sBit == "stealth")
+			SET_FLOAT(fAppearances[APPEARANCE_STEALTH])
+		else if (sBit == "stealthtype")
+			m_bStealthType = on;
+		else if (sBit == "stealthpastreceptors")
+			m_bStealthPastReceptors = on;
+		else {
+			for (int i = 0; i < 16; i++) {
+				sMod = ssprintf("stealth%d", i + 1);
+				if (sBit == sMod) {
+					SET_FLOAT(fStealth[i])
+					break;
+				}
+			}
+		}
+	} else if (sBit == "blink")
 		SET_FLOAT(fAppearances[APPEARANCE_BLINK])
 	else if (sBit == "randomvanish")
 		SET_FLOAT(fAppearances[APPEARANCE_RANDOMVANISH])
@@ -1010,6 +1036,8 @@ PlayerOptions::operator==(const PlayerOptions& other) const
 	COMPARE(m_MinTNSToHideNotes);
 	COMPARE(m_bMuteOnError);
 	COMPARE(m_bCosecant);
+	COMPARE(m_bStealthType);
+	COMPARE(m_bStealthPastReceptors);
 	COMPARE(m_fDark);
 	COMPARE(m_fBlind);
 	COMPARE(m_fCover);
@@ -1037,6 +1065,8 @@ PlayerOptions::operator==(const PlayerOptions& other) const
 		COMPARE(m_bTurns[i]);
 	for (auto i = 0; i < PlayerOptions::NUM_TRANSFORMS; ++i)
 		COMPARE(m_bTransforms[i]);
+	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fStealth[i]);
 #undef COMPARE
 	return true;
 }
@@ -1062,6 +1092,8 @@ PlayerOptions::operator=(PlayerOptions const& other)
 	CPY(m_MinTNSToHideNotes);
 	CPY(m_bMuteOnError);
 	CPY(m_bCosecant);
+	CPY(m_bStealthType);
+	CPY(m_bStealthPastReceptors);
 	CPY_SPEED(fDark);
 	CPY_SPEED(fBlind);
 	CPY_SPEED(fCover);
@@ -1091,6 +1123,9 @@ PlayerOptions::operator=(PlayerOptions const& other)
 	}
 	for (auto i = 0; i < PlayerOptions::NUM_TRANSFORMS; ++i) {
 		CPY(m_bTransforms[i]);
+	}
+	for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fStealth[i]);
 	}
 #undef CPY
 #undef CPY_SPEED
@@ -1314,8 +1349,8 @@ PlayerOptions::ResetPrefs(ResetPrefsType type)
 	CPY(m_DrainType);
 	CPY(m_BatteryLives);
 	CPY(m_MinTNSToHideNotes);
-
 	CPY(m_fPerspectiveTilt);
+
 	CPY(m_bTransforms[TRANSFORM_NOHOLDS]);
 	CPY(m_bTransforms[TRANSFORM_NOROLLS]);
 	CPY(m_bTransforms[TRANSFORM_NOMINES]);
@@ -1336,6 +1371,8 @@ PlayerOptions::ResetPrefs(ResetPrefsType type)
 	CPY(m_fDark);
 	CPY(m_fBlind);
 	CPY(m_fCover);
+	CPY(m_bStealthType);
+	CPY(m_bStealthPastReceptors);
 	// Don't clear this.
 	// CPY( m_sNoteSkin );
 #undef CPY
@@ -1366,6 +1403,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(MaxScrollBPM, MaxScrollBPM, true);
 	FLOAT_INTERFACE(ScrollSpeed, ScrollSpeed, true);
 	FLOAT_INTERFACE(ScrollBPM, ScrollBPM, true);
+
 	FLOAT_INTERFACE(Boost, Accels[PlayerOptions::ACCEL_BOOST], true);
 	FLOAT_INTERFACE(Brake, Accels[PlayerOptions::ACCEL_BRAKE], true);
 	FLOAT_INTERFACE(Wave, Accels[PlayerOptions::ACCEL_WAVE], true);
@@ -1379,6 +1417,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 					Accels[PlayerOptions::ACCEL_TAN_EXPAND_PERIOD],
 					true);
 	FLOAT_INTERFACE(Boomerang, Accels[PlayerOptions::ACCEL_BOOMERANG], true);
+
 	FLOAT_INTERFACE(Drunk, Effects[PlayerOptions::EFFECT_DRUNK], true);
 	FLOAT_INTERFACE(Dizzy, Effects[PlayerOptions::EFFECT_DIZZY], true);
 	FLOAT_INTERFACE(Confusion, Effects[PlayerOptions::EFFECT_CONFUSION], true);
@@ -1393,6 +1432,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(Xmode, Effects[PlayerOptions::EFFECT_XMODE], true);
 	FLOAT_INTERFACE(Twirl, Effects[PlayerOptions::EFFECT_TWIRL], true);
 	FLOAT_INTERFACE(Roll, Effects[PlayerOptions::EFFECT_ROLL], true);
+
 	FLOAT_INTERFACE(Hidden,
 					Appearances[PlayerOptions::APPEARANCE_HIDDEN],
 					true);
@@ -1412,14 +1452,17 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(RandomVanish,
 					Appearances[PlayerOptions::APPEARANCE_RANDOMVANISH],
 					true);
+
 	FLOAT_INTERFACE(Reverse, Scrolls[PlayerOptions::SCROLL_REVERSE], true);
 	FLOAT_INTERFACE(Split, Scrolls[PlayerOptions::SCROLL_SPLIT], true);
 	FLOAT_INTERFACE(Alternate, Scrolls[PlayerOptions::SCROLL_ALTERNATE], true);
 	FLOAT_INTERFACE(Cross, Scrolls[PlayerOptions::SCROLL_CROSS], true);
 	FLOAT_INTERFACE(Centered, Scrolls[PlayerOptions::SCROLL_CENTERED], true);
+
 	FLOAT_INTERFACE(Dark, Dark, true);
 	FLOAT_INTERFACE(Blind, Blind, true);
 	FLOAT_INTERFACE(Cover, Cover, true);
+
 	FLOAT_INTERFACE(RandAttack, RandAttack, true);
 	FLOAT_INTERFACE(NoAttack, NoAttack, true);
 	FLOAT_INTERFACE(PlayerAutoPlay, PlayerAutoPlay, true);
@@ -1435,7 +1478,13 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 											   // expects the result they get.
 											   // -Kyz
 	FLOAT_INTERFACE(RandomSpeed, RandomSpeed, true);
+
 	BOOL_INTERFACE(Cosecant, Cosecant);
+	BOOL_INTERFACE(StealthType, StealthType);
+	BOOL_INTERFACE(StealthPastReceptors, StealthPastReceptors);
+
+	MULTICOL_FLOAT_INTERFACE(Stealth, Stealth, true);
+
 	BOOL_INTERFACE(TurnNone, Turns[PlayerOptions::TURN_NONE]);
 	BOOL_INTERFACE(Mirror, Turns[PlayerOptions::TURN_MIRROR]);
 	BOOL_INTERFACE(Backwards, Turns[PlayerOptions::TURN_BACKWARDS]);
@@ -1471,6 +1520,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	BOOL_INTERFACE(NoFakes, Transforms[PlayerOptions::TRANSFORM_NOFAKES]);
 	BOOL_INTERFACE(NoQuads, Transforms[PlayerOptions::TRANSFORM_NOQUADS]);
 	BOOL_INTERFACE(NoStretch, Transforms[PlayerOptions::TRANSFORM_NOSTRETCH]);
+
 	BOOL_INTERFACE(MuteOnError, MuteOnError);
 	BOOL_INTERFACE(PracticeMode, Practice)
 	ENUM_INTERFACE(FailSetting, FailType, FailType);
@@ -1746,14 +1796,24 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 
 	LunaPlayerOptions()
 	{
+		ADD_METHOD(IsEasierForSongAndSteps);
+
+		ADD_METHOD(LifeSetting);
+		ADD_METHOD(DrainSetting);
+		ADD_METHOD(BatteryLives);
+		ADD_METHOD(TimeSpacing);
+		ADD_METHOD(MaxScrollBPM);
+		ADD_METHOD(ScrollSpeed);
+		ADD_METHOD(ScrollBPM);
+
 		ADD_METHOD(Boost);
 		ADD_METHOD(Brake);
 		ADD_METHOD(Wave);
-		ADD_METHOD(WavePeriod);
+		ADD_METHOD(WavePeriod); // functional but needs verification
 		ADD_METHOD(Expand);
-		ADD_METHOD(ExpandPeriod);
-		ADD_METHOD(TanExpand);
-		ADD_METHOD(TanExpandPeriod);
+		ADD_METHOD(ExpandPeriod);	 // functional but needs verification
+		ADD_METHOD(TanExpand);		 // functional but needs verification
+		ADD_METHOD(TanExpandPeriod); // functional but needs verification
 		ADD_METHOD(Boomerang);
 
 		ADD_METHOD(Drunk);
@@ -1767,7 +1827,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Tipsy);
 		ADD_METHOD(Bumpy);
 		ADD_METHOD(Beat);
-		ADD_METHOD(Xmode);
+		ADD_METHOD(Xmode); // depends on player2, so broken, fix later mb
 		ADD_METHOD(Twirl);
 		ADD_METHOD(Roll);
 
@@ -1776,6 +1836,8 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Sudden);
 		ADD_METHOD(SuddenOffset);
 		ADD_METHOD(Stealth);
+		ADD_METHOD(StealthType);		  // not functional? fix it?
+		ADD_METHOD(StealthPastReceptors); // not functional. fix it
 		ADD_METHOD(Blink);
 		ADD_METHOD(RandomVanish);
 
@@ -1789,7 +1851,10 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Blind);
 		ADD_METHOD(Cover);
 
-		ADD_METHOD(Cosecant);
+		ADD_METHOD(Cosecant); // not functional? fix it?
+
+		ADD_METHOD(RandAttack);
+		ADD_METHOD(NoAttack);
 
 		ADD_METHOD(TurnNone);
 		ADD_METHOD(Mirror);
@@ -1829,39 +1894,30 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(CMod);
 		ADD_METHOD(XMod);
 		ADD_METHOD(MMod);
-		ADD_METHOD(TimeSpacing);
-		ADD_METHOD(MaxScrollBPM);
-		ADD_METHOD(ScrollSpeed);
-		ADD_METHOD(ScrollBPM);
 
 		ADD_METHOD(Overhead);
 		ADD_METHOD(Incoming);
 		ADD_METHOD(Space);
 		ADD_METHOD(Hallway);
 		ADD_METHOD(Distant);
-		ADD_METHOD(Tilt);
-		ADD_METHOD(Skew);
-		ADD_METHOD(RandomSpeed);
-
-		ADD_METHOD(RandAttack);
-		ADD_METHOD(NoAttack);
 
 		ADD_METHOD(PlayerAutoPlay);
-		ADD_METHOD(LifeSetting);
-		ADD_METHOD(DrainSetting);
-		ADD_METHOD(BatteryLives);
-		ADD_METHOD(FailSetting);
+		ADD_METHOD(Tilt);
+		ADD_METHOD(Skew);
 		ADD_METHOD(Passmark);
+		ADD_METHOD(RandomSpeed);
 
-		ADD_METHOD(MuteOnError);
+		ADD_MULTICOL_METHOD(Stealth); // functional, verified!
 
 		ADD_METHOD(NoteSkin);
+		ADD_METHOD(MuteOnError);
+		ADD_METHOD(FailSetting);
 		ADD_METHOD(MinTNSToHideNotes);
 
 		ADD_METHOD(UsingReverse);
 		ADD_METHOD(GetReversePercentForColumn);
+
 		ADD_METHOD(GetStepAttacks);
-		ADD_METHOD(IsEasierForSongAndSteps);
 		ADD_METHOD(ContainsTransformOrTurn);
 		ADD_METHOD(GetInvalidatingMods);
 		// ADD_METHOD(PracticeMode); -- Restrict theme access to practice mode

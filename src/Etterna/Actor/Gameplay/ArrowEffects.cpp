@@ -112,7 +112,7 @@ static ThemeMetric<bool> DIZZY_HOLD_HEADS("ArrowEffects", "DizzyHoldHeads");
 static const PlayerOptions* curr_options = nullptr;
 
 float
-ArrowGetPercentVisible(float fYPosWithoutReverse);
+ArrowGetPercentVisible(float fYPosWithoutReverse, int iCol, float fYOffset);
 
 static float
 GetNoteFieldHeight()
@@ -803,9 +803,15 @@ GetSuddenStartLine()
 
 // used by ArrowGetAlpha and ArrowGetGlow below
 float
-ArrowGetPercentVisible(float fYPosWithoutReverse)
+ArrowGetPercentVisible(float fYPosWithoutReverse, int iCol, float fYOffset)
 {
 	const auto fDistFromCenterLine = fYPosWithoutReverse - GetCenterLine();
+
+	float fYPos;
+	if (curr_options->m_bStealthType)
+		fYPos = fYOffset;
+	else
+		fYPos = fYPosWithoutReverse;
 
 	if (fYPosWithoutReverse < 0 &&
 		HIDDEN_SUDDEN_PAST_RECEPTOR) // past Gray Arrows
@@ -832,6 +838,8 @@ ArrowGetPercentVisible(float fYPosWithoutReverse)
 
 	if (fAppearances[PlayerOptions::APPEARANCE_STEALTH] != 0)
 		fVisibleAdjust -= fAppearances[PlayerOptions::APPEARANCE_STEALTH];
+	if (curr_options->m_fStealth[iCol] != 0)
+		fVisibleAdjust -= curr_options->m_fStealth[iCol];
 	if (fAppearances[PlayerOptions::APPEARANCE_BLINK] != 0) {
 		auto f = RageFastSin(RageTimer::GetTimeSinceStart() * 10);
 		f = Quantize(f, BLINK_MOD_FREQUENCY);
@@ -862,7 +870,8 @@ ArrowEffects::GetAlpha(int iCol,
 	const auto fYPosWithoutReverse =
 	  GetYPos(iCol, fYOffset, fYReverseOffsetPixels, false);
 
-	auto fPercentVisible = ArrowGetPercentVisible(fYPosWithoutReverse);
+	auto fPercentVisible =
+	  ArrowGetPercentVisible(fYPosWithoutReverse, iCol, fYOffset);
 
 	if (fPercentFadeToFail != -1)
 		fPercentVisible = 1 - fPercentFadeToFail;
@@ -892,7 +901,8 @@ ArrowEffects::GetGlow(int iCol,
 	const auto fYPosWithoutReverse =
 	  GetYPos(iCol, fYOffset, fYReverseOffsetPixels, false);
 
-	auto fPercentVisible = ArrowGetPercentVisible(fYPosWithoutReverse);
+	auto fPercentVisible =
+	  ArrowGetPercentVisible(fYPosWithoutReverse, iCol, fYOffset);
 
 	if (fPercentFadeToFail != -1)
 		fPercentVisible = 1 - fPercentFadeToFail;
