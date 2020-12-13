@@ -667,10 +667,17 @@ ArrowEffects::GetXPos(const PlayerState* pPlayerState,
 }
 
 float
-ArrowEffects::GetRotationX(float fYOffset)
+ArrowEffects::GetRotationX(const PlayerState* pPlayerState,
+						   float fYOffset,
+						   bool bIsHoldCap,
+						   int iCol)
 {
 	const auto* const fEffects = curr_options->m_fEffects;
 	float fRotation = 0;
+	if (fEffects[PlayerOptions::EFFECT_CONFUSION_X] != 0 ||
+		fEffects[PlayerOptions::EFFECT_CONFUSION_X_OFFSET] != 0 ||
+		curr_options->m_fConfusionX[iCol] != 0)
+		fRotation += ReceptorGetRotationX(pPlayerState, iCol);
 	if (fEffects[PlayerOptions::EFFECT_ROLL] != 0) {
 		fRotation = fEffects[PlayerOptions::EFFECT_ROLL] * fYOffset / 2;
 	}
@@ -678,10 +685,16 @@ ArrowEffects::GetRotationX(float fYOffset)
 }
 
 float
-ArrowEffects::GetRotationY(float fYOffset)
+ArrowEffects::GetRotationY(const PlayerState* pPlayerState,
+						   float fYOffset,
+						   int iCol)
 {
 	const auto* const fEffects = curr_options->m_fEffects;
 	float fRotation = 0;
+	if (fEffects[PlayerOptions::EFFECT_CONFUSION_Y] != 0 ||
+		fEffects[PlayerOptions::EFFECT_CONFUSION_Y_OFFSET] != 0 ||
+		curr_options->m_fConfusionY[iCol] != 0)
+		fRotation += ReceptorGetRotationY(pPlayerState, iCol);
 	if (fEffects[PlayerOptions::EFFECT_TWIRL] != 0) {
 		fRotation = fEffects[PlayerOptions::EFFECT_TWIRL] * fYOffset / 2;
 	}
@@ -711,6 +724,48 @@ ArrowEffects::GetRotationZ(const PlayerState* pPlayerState,
 		fDizzyRotation *= 180 / PI;
 		fRotation += fDizzyRotation;
 	}
+	return fRotation;
+}
+
+float
+ArrowEffects::ReceptorGetRotationX(const PlayerState* pPlayerState, int iCol)
+{
+	const float* fEffects = curr_options->m_fEffects;
+	float fRotation = 0;
+	if (curr_options->m_fConfusionX[iCol] != 0)
+		fRotation += curr_options->m_fConfusionX[iCol] * 180.0f / PI;
+	if (fEffects[PlayerOptions::EFFECT_CONFUSION_X_OFFSET] != 0)
+		fRotation +=
+		  fEffects[PlayerOptions::EFFECT_CONFUSION_X_OFFSET] * 180.0f / PI;
+	if (fEffects[PlayerOptions::EFFECT_CONFUSION_X] != 0) {
+		auto fConfRotation = GAMESTATE->m_Position.m_fSongBeatVisible;
+		fConfRotation *= fEffects[PlayerOptions::EFFECT_CONFUSION_X];
+		fConfRotation = fmodf(fConfRotation, 2 * PI);
+		fConfRotation *= -180 / PI;
+		fRotation += fConfRotation;
+	}
+
+	return fRotation;
+}
+
+float
+ArrowEffects::ReceptorGetRotationY(const PlayerState* pPlayerState, int iCol)
+{
+	const float* fEffects = curr_options->m_fEffects;
+	float fRotation = 0;
+	if (curr_options->m_fConfusionY[iCol] != 0)
+		fRotation += curr_options->m_fConfusionY[iCol] * 180.0f / PI;
+	if (fEffects[PlayerOptions::EFFECT_CONFUSION_Y_OFFSET] != 0)
+		fRotation +=
+		  fEffects[PlayerOptions::EFFECT_CONFUSION_Y_OFFSET] * 180.0f / PI;
+	if (fEffects[PlayerOptions::EFFECT_CONFUSION_Y] != 0) {
+		auto fConfRotation = GAMESTATE->m_Position.m_fSongBeatVisible;
+		fConfRotation *= fEffects[PlayerOptions::EFFECT_CONFUSION_Y];
+		fConfRotation = fmodf(fConfRotation, 2 * PI);
+		fConfRotation *= -180 / PI;
+		fRotation += fConfRotation;
+	}
+
 	return fRotation;
 }
 
@@ -1127,7 +1182,9 @@ GetRotationX(lua_State* L)
 {
 	auto* ps = Luna<PlayerState>::check(L, 1);
 	ArrowEffects::SetCurrentOptions(&ps->m_PlayerOptions.GetCurrent());
-	lua_pushnumber(L, ArrowEffects::GetRotationX(FArg(2)));
+	bool bIsHoldCap = false;
+	lua_pushnumber(
+	  L, ArrowEffects::GetRotationX(ps, FArg(2), bIsHoldCap, IArg(3) - 1));
 	return 1;
 }
 
@@ -1137,7 +1194,7 @@ GetRotationY(lua_State* L)
 {
 	auto* ps = Luna<PlayerState>::check(L, 1);
 	ArrowEffects::SetCurrentOptions(&ps->m_PlayerOptions.GetCurrent());
-	lua_pushnumber(L, ArrowEffects::GetRotationY(FArg(2)));
+	lua_pushnumber(L, ArrowEffects::GetRotationY(ps, FArg(2), IArg(3) - 1));
 	return 1;
 }
 
@@ -1279,14 +1336,23 @@ GetFrameWidthScale(lua_State* L)
 }
 
 const luaL_Reg ArrowEffectsTable[] = {
-	LIST_METHOD(Update),		LIST_METHOD(GetYOffset),
-	LIST_METHOD(GetYPos),		LIST_METHOD(GetYOffsetFromYPos),
-	LIST_METHOD(GetXPos),		LIST_METHOD(GetZPos),
-	LIST_METHOD(GetRotationX),	LIST_METHOD(GetRotationY),
-	LIST_METHOD(GetRotationZ),	LIST_METHOD(ReceptorGetRotationZ),
-	LIST_METHOD(GetAlpha),		LIST_METHOD(GetGlow),
-	LIST_METHOD(GetBrightness), LIST_METHOD(NeedZBuffer),
-	LIST_METHOD(GetZoom),		LIST_METHOD(GetFrameWidthScale),
+	LIST_METHOD(Update),
+	LIST_METHOD(GetYOffset),
+	LIST_METHOD(GetYPos),
+	LIST_METHOD(GetYOffsetFromYPos),
+	LIST_METHOD(GetXPos),
+	LIST_METHOD(GetZPos),
+	LIST_METHOD(GetRotationX),
+	LIST_METHOD(GetRotationY),
+	LIST_METHOD(GetRotationZ),
+	LIST_METHOD(ReceptorGetRotationZ),
+	// LIST_METHOD(ReceptorGetRotationX),	LIST_METHOD(ReceptorGetRotationY),
+	LIST_METHOD(GetAlpha),
+	LIST_METHOD(GetGlow),
+	LIST_METHOD(GetBrightness),
+	LIST_METHOD(NeedZBuffer),
+	LIST_METHOD(GetZoom),
+	LIST_METHOD(GetFrameWidthScale),
 	{ nullptr, nullptr }
 };
 } // namespace

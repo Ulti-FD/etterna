@@ -82,8 +82,17 @@ class ArrowEffects
 	// Due to the handling logic for holds on Twirl, we need to use an offset
 	// instead. It's more intuitive for Roll to be based off offset, so use an
 	// offset there too.
-	static auto GetRotationX(float fYOffset) -> float;
-	static auto GetRotationY(float fYOffset) -> float;
+	static auto GetRotationX(const PlayerState* pPlayerState,
+							 float fYOffset,
+							 bool bIsHoldCap,
+							 int iCol) -> float;
+	static auto GetRotationY(const PlayerState* pPlayerState,
+							 float fYOffset,
+							 int iCol) -> float;
+	static auto ReceptorGetRotationX(const PlayerState* pPlayerState, int iCol)
+	  -> float;
+	static auto ReceptorGetRotationY(const PlayerState* pPlayerState, int iCol)
+	  -> float;
 
 	// fXPos is a horizontal position in pixels relative to the center of the
 	// field. This depends on the column of the arrow and possibly the Arrow

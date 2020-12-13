@@ -101,10 +101,14 @@ PlayerOptions::Init()
 	m_bStealthType = false;
 	m_bStealthPastReceptors = false;
 	m_bCosecant = false;
-	ZERO(m_fStealth);
-	ONE(m_SpeedfStealth);
 	ZERO(m_fConfusionZ);
 	ONE(m_SpeedfConfusionZ);
+	ZERO(m_fConfusionY);
+	ONE(m_SpeedfConfusionY);
+	ZERO(m_fConfusionZ);
+	ONE(m_SpeedfConfusionZ);
+	ZERO(m_fStealth);
+	ONE(m_SpeedfStealth);
 }
 
 void
@@ -151,6 +155,10 @@ PlayerOptions::Approach(const PlayerOptions& other, float fDeltaSeconds)
 	DO_COPY(m_MinTNSToHideNotes);
 	DO_COPY(m_sNoteSkin);
 	DO_COPY(m_bCosecant);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fConfusionX[i]);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fConfusionY[i]);
 	for (int i = 0; i < 16; i++)
 		APPROACH(fConfusionZ[i]);
 	for (int i = 0; i < 16; i++)
@@ -246,6 +254,10 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fEffects[EFFECT_DIZZY], "Dizzy");
 	AddPart(AddTo, m_fEffects[EFFECT_CONFUSION], "Confusion");
 	AddPart(AddTo, m_fEffects[EFFECT_CONFUSION_OFFSET], "ConfusionOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_CONFUSION_X], "ConfusionX");
+	AddPart(AddTo, m_fEffects[EFFECT_CONFUSION_X_OFFSET], "ConfusionXOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_CONFUSION_Y], "ConfusionY");
+	AddPart(AddTo, m_fEffects[EFFECT_CONFUSION_Y_OFFSET], "ConfusionYOffset");
 	AddPart(AddTo, m_fEffects[EFFECT_MINI], "Mini");
 	AddPart(AddTo, m_fEffects[EFFECT_TINY], "Tiny");
 	AddPart(AddTo, m_fEffects[EFFECT_FLIP], "Flip");
@@ -288,6 +300,10 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	for (int i = 0; i < 16; i++) {
 		auto s = ssprintf("Stealth%d", i + 1);
 		AddPart(AddTo, m_fStealth[i], s);
+		s = ssprintf("ConfusionXOffset%d", i + 1);
+		AddPart(AddTo, m_fConfusionX[i], s);
+		s = ssprintf("ConfusionYOffset%d", i + 1);
+		AddPart(AddTo, m_fConfusionY[i], s);
 		s = ssprintf("ConfusionZOffset%d", i + 1);
 		AddPart(AddTo, m_fConfusionZ[i], s);
 	}
@@ -600,7 +616,35 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 	else if (sBit == "dizzy")
 		SET_FLOAT(fEffects[EFFECT_DIZZY])
 	else if (sBit.find("confusion") != sBit.npos) {
-		if (sBit == "confusion")
+		if (sBit.find("x") != sBit.npos) {
+			if (sBit == "confusionx")
+				SET_FLOAT(fEffects[EFFECT_CONFUSION_X])
+			else if (sBit == "confusionxoffset")
+				SET_FLOAT(fEffects[EFFECT_CONFUSION_X_OFFSET])
+			else {
+				for (int i = 0; i < 16; i++) {
+					sMod = ssprintf("confusionxoffset%d", i + 1);
+					if (sBit == sMod) {
+						SET_FLOAT(fConfusionX[i])
+						break;
+					}
+				}
+			}
+		} else if (sBit.find("y") != sBit.npos) {
+			if (sBit == "confusiony")
+				SET_FLOAT(fEffects[EFFECT_CONFUSION_Y])
+			else if (sBit == "confusionyoffset")
+				SET_FLOAT(fEffects[EFFECT_CONFUSION_Y_OFFSET])
+			else {
+				for (int i = 0; i < 16; i++) {
+					sMod = ssprintf("confusionyoffset%d", i + 1);
+					if (sBit == sMod) {
+						SET_FLOAT(fConfusionY[i])
+						break;
+					}
+				}
+			}
+		} else if (sBit == "confusion")
 			SET_FLOAT(fEffects[EFFECT_CONFUSION])
 		else if (sBit == "confusionoffset")
 			SET_FLOAT(fEffects[EFFECT_CONFUSION_OFFSET])
@@ -1086,6 +1130,10 @@ PlayerOptions::operator==(const PlayerOptions& other) const
 	for (int i = 0; i < 16; ++i)
 		COMPARE(m_fStealth[i]);
 	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fConfusionX[i]);
+	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fConfusionY[i]);
+	for (int i = 0; i < 16; ++i)
 		COMPARE(m_fConfusionZ[i]);
 #undef COMPARE
 	return true;
@@ -1143,6 +1191,12 @@ PlayerOptions::operator=(PlayerOptions const& other)
 	}
 	for (auto i = 0; i < PlayerOptions::NUM_TRANSFORMS; ++i) {
 		CPY(m_bTransforms[i]);
+	}
+	for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fConfusionX[i]);
+	}
+	for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fConfusionY[i]);
 	}
 	for (int i = 0; i < 16; ++i) {
 		CPY_SPEED(fConfusionZ[i]);
@@ -1447,6 +1501,18 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(ConfusionOffset,
 					Effects[PlayerOptions::EFFECT_CONFUSION_OFFSET],
 					true);
+	FLOAT_INTERFACE(ConfusionX,
+					Effects[PlayerOptions::EFFECT_CONFUSION_X],
+					true);
+	FLOAT_INTERFACE(ConfusionXOffset,
+					Effects[PlayerOptions::EFFECT_CONFUSION_X_OFFSET],
+					true);
+	FLOAT_INTERFACE(ConfusionY,
+					Effects[PlayerOptions::EFFECT_CONFUSION_Y],
+					true);
+	FLOAT_INTERFACE(ConfusionYOffset,
+					Effects[PlayerOptions::EFFECT_CONFUSION_Y_OFFSET],
+					true);
 	FLOAT_INTERFACE(Mini, Effects[PlayerOptions::EFFECT_MINI], true);
 	FLOAT_INTERFACE(Tiny, Effects[PlayerOptions::EFFECT_TINY], true);
 	FLOAT_INTERFACE(Flip, Effects[PlayerOptions::EFFECT_FLIP], true);
@@ -1509,8 +1575,10 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	BOOL_INTERFACE(StealthType, StealthType);
 	BOOL_INTERFACE(StealthPastReceptors, StealthPastReceptors);
 
-	MULTICOL_FLOAT_INTERFACE(Stealth, Stealth, true);
+	MULTICOL_FLOAT_INTERFACE(ConfusionXOffset, ConfusionX, true);
+	MULTICOL_FLOAT_INTERFACE(ConfusionYOffset, ConfusionY, true);
 	MULTICOL_FLOAT_INTERFACE(ConfusionOffset, ConfusionZ, true);
+	MULTICOL_FLOAT_INTERFACE(Stealth, Stealth, true);
 
 	BOOL_INTERFACE(TurnNone, Turns[PlayerOptions::TURN_NONE]);
 	BOOL_INTERFACE(Mirror, Turns[PlayerOptions::TURN_MIRROR]);
@@ -1846,7 +1914,11 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Drunk);
 		ADD_METHOD(Dizzy);
 		ADD_METHOD(Confusion);
-		ADD_METHOD(ConfusionOffset); // functional, verified!
+		ADD_METHOD(ConfusionOffset);  // functional, verified!
+		ADD_METHOD(ConfusionX);		  // functional, verified!
+		ADD_METHOD(ConfusionXOffset); // functional, verified!
+		ADD_METHOD(ConfusionY);		  // functional, verified!
+		ADD_METHOD(ConfusionYOffset); // functional, verified!
 		ADD_METHOD(Mini);
 		ADD_METHOD(Tiny);
 		ADD_METHOD(Flip);
@@ -1879,7 +1951,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Blind);
 		ADD_METHOD(Cover);
 
-		ADD_METHOD(Cosecant); // not functional? fix it?
+		ADD_METHOD(Cosecant); // functional but needs verification
 
 		ADD_METHOD(RandAttack);
 		ADD_METHOD(NoAttack);
@@ -1937,6 +2009,10 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 
 		ADD_MULTICOL_METHOD(Stealth);		  // functional, verified!
 		ADD_MULTICOL_METHOD(ConfusionOffset); // functional, verified!
+		ADD_MULTICOL_METHOD(
+		  ConfusionXOffset); // functional and verified
+							 // but doesn't auto reset to 0? investigate
+		ADD_MULTICOL_METHOD(ConfusionYOffset); // functional, verified!
 
 		ADD_METHOD(NoteSkin);
 		ADD_METHOD(MuteOnError);

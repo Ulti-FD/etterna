@@ -70,6 +70,10 @@ class PlayerOptions
 		ZERO(m_bTransforms);
 		ZERO(m_fStealth);
 		ONE(m_SpeedfStealth);
+		ZERO(m_fConfusionX);
+		ONE(m_SpeedfConfusionX);
+		ZERO(m_fConfusionY);
+		ONE(m_SpeedfConfusionY);
 		ZERO(m_fConfusionZ);
 		ONE(m_SpeedfConfusionZ);
 	};
@@ -139,6 +143,10 @@ class PlayerOptions
 		EFFECT_DIZZY,
 		EFFECT_CONFUSION,
 		EFFECT_CONFUSION_OFFSET,
+		EFFECT_CONFUSION_X,
+		EFFECT_CONFUSION_X_OFFSET,
+		EFFECT_CONFUSION_Y,
+		EFFECT_CONFUSION_Y_OFFSET,
 		EFFECT_MINI,
 		EFFECT_TINY,
 		EFFECT_FLIP,
@@ -274,8 +282,10 @@ class PlayerOptions
 	bool m_bMuteOnError{ false };
 	bool m_bPractice{ false };
 
-	float m_fStealth[16], m_SpeedfStealth[16];
+	float m_fConfusionX[16], m_SpeedfConfusionX[16];
+	float m_fConfusionY[16], m_SpeedfConfusionY[16];
 	float m_fConfusionZ[16], m_SpeedfConfusionZ[16];
+	float m_fStealth[16], m_SpeedfStealth[16];
 
 	bool m_bCosecant{ false };
 	bool m_bStealthType{ false };
