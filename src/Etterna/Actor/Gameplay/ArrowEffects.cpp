@@ -691,12 +691,15 @@ ArrowEffects::GetRotationY(float fYOffset)
 float
 ArrowEffects::GetRotationZ(const PlayerState* pPlayerState,
 						   float fNoteBeat,
-						   bool bIsHoldHead)
+						   bool bIsHoldHead,
+						   int iCol)
 {
 	const auto* const fEffects = curr_options->m_fEffects;
 	float fRotation = 0;
-	if (fEffects[PlayerOptions::EFFECT_CONFUSION] != 0)
-		fRotation += ReceptorGetRotationZ(pPlayerState);
+	if (fEffects[PlayerOptions::EFFECT_CONFUSION] != 0 ||
+		fEffects[PlayerOptions::EFFECT_CONFUSION_OFFSET] != 0 ||
+		curr_options->m_fConfusionZ[iCol] != 0)
+		fRotation += ReceptorGetRotationZ(pPlayerState, iCol);
 
 	// As usual, enable dizzy hold heads at your own risk. -Wolfman2000
 	if (fEffects[PlayerOptions::EFFECT_DIZZY] != 0 &&
@@ -712,11 +715,16 @@ ArrowEffects::GetRotationZ(const PlayerState* pPlayerState,
 }
 
 float
-ArrowEffects::ReceptorGetRotationZ(const PlayerState* pPlayerState)
+ArrowEffects::ReceptorGetRotationZ(const PlayerState* pPlayerState, int iCol)
 {
 	const auto* const fEffects = curr_options->m_fEffects;
 	float fRotation = 0;
 
+	if (curr_options->m_fConfusionZ[iCol] != 0)
+		fRotation += curr_options->m_fConfusionZ[iCol] * 180.0f / PI;
+	if (fEffects[PlayerOptions::EFFECT_CONFUSION_OFFSET] != 0)
+		fRotation +=
+		  fEffects[PlayerOptions::EFFECT_CONFUSION_OFFSET] * 180.0f / PI;
 	if (fEffects[PlayerOptions::EFFECT_CONFUSION] != 0) {
 		auto fConfRotation = GAMESTATE->m_Position.m_fSongBeatVisible;
 		fConfRotation *= fEffects[PlayerOptions::EFFECT_CONFUSION];
@@ -1133,7 +1141,7 @@ GetRotationY(lua_State* L)
 	return 1;
 }
 
-// ( PlayerState ps, float fNoteBeat, bool bIsHoldHead )
+// ( PlayerState ps, float fNoteBeat, bool bIsHoldHead, int iCol)
 int
 GetRotationZ(lua_State* L)
 {
@@ -1144,17 +1152,18 @@ GetRotationZ(lua_State* L)
 	if (lua_gettop(L) >= 3 && !lua_isnil(L, 3)) {
 		bIsHoldHead = BArg(3);
 	}
-	lua_pushnumber(L, ArrowEffects::GetRotationZ(ps, FArg(2), bIsHoldHead));
+	lua_pushnumber(
+	  L, ArrowEffects::GetRotationZ(ps, FArg(2), bIsHoldHead, IArg(4) - 1));
 	return 1;
 }
 
-// ( PlayerState ps )
+// ( PlayerState ps , int iCol )
 int
 ReceptorGetRotationZ(lua_State* L)
 {
 	auto* ps = Luna<PlayerState>::check(L, 1);
 	ArrowEffects::SetCurrentOptions(&ps->m_PlayerOptions.GetCurrent());
-	lua_pushnumber(L, ArrowEffects::ReceptorGetRotationZ(ps));
+	lua_pushnumber(L, ArrowEffects::ReceptorGetRotationZ(ps, IArg(2) - 1));
 	return 1;
 }
 

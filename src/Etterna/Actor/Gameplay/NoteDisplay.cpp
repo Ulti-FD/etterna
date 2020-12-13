@@ -629,8 +629,7 @@ NoteDisplay::DrawHoldsInRange(
 									: field_args.fail_fade);
 
 		const auto note_upcoming =
-		  NoteRowToBeat(start_row) >
-		  GAMESTATE->m_Position.m_fSongBeat;
+		  NoteRowToBeat(start_row) > GAMESTATE->m_Position.m_fSongBeat;
 		any_upcoming |= note_upcoming;
 	}
 	return any_upcoming;
@@ -708,8 +707,8 @@ NoteDisplay::DrawTapsInRange(
 				in_selection_range ? field_args.selection_glow
 								   : field_args.fail_fade);
 
-		any_upcoming |= NoteRowToBeat(tap_row) >
-						GAMESTATE->m_Position.m_fSongBeat;
+		any_upcoming |=
+		  NoteRowToBeat(tap_row) > GAMESTATE->m_Position.m_fSongBeat;
 
 		if (!PREFSMAN->m_FastNoteRendering) {
 			DISPLAY->ClearZBuffer();
@@ -1646,16 +1645,16 @@ NoteDisplay::DrawActor(const TapNote& tn,
 				ae_rot.x = ArrowEffects::GetRotationX(fYOffset);
 			}
 			ae_rot.y = ArrowEffects::GetRotationY(fYOffset);
-			ae_rot.z =
-			  ArrowEffects::GetRotationZ(m_pPlayerState, fBeat, bIsHoldHead);
+			ae_rot.z = ArrowEffects::GetRotationZ(
+			  m_pPlayerState, fBeat, bIsHoldHead, column_args.column);
 			break;
 		case NCSM_Offset:
 			if (!bIsHoldCap) {
 				ae_rot.x = ArrowEffects::GetRotationX(fYOffset);
 			}
 			ae_rot.y = ArrowEffects::GetRotationY(fYOffset);
-			ae_rot.z =
-			  ArrowEffects::GetRotationZ(m_pPlayerState, fBeat, bIsHoldHead);
+			ae_rot.z = ArrowEffects::GetRotationZ(
+			  m_pPlayerState, fBeat, bIsHoldHead, column_args.column);
 			column_args.rot_handler->EvalForBeat(
 			  column_args.song_beat, spline_beat, sp_rot);
 			break;
@@ -1851,10 +1850,12 @@ NoteColumnRenderer::UpdateReceptorGhostStuff(Actor* receptor) const
 	}
 	switch (NCR_current.m_rot_handler.m_spline_mode) {
 		case NCSM_Disabled:
-			ae_rot.z = ArrowEffects::ReceptorGetRotationZ(player_state);
+			ae_rot.z =
+			  ArrowEffects::ReceptorGetRotationZ(player_state, m_column);
 			break;
 		case NCSM_Offset:
-			ae_rot.z = ArrowEffects::ReceptorGetRotationZ(player_state);
+			ae_rot.z =
+			  ArrowEffects::ReceptorGetRotationZ(player_state, m_column);
 			NCR_current.m_rot_handler.EvalForReceptor(song_beat, sp_rot);
 			break;
 		case NCSM_Position:

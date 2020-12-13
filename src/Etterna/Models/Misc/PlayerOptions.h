@@ -70,6 +70,8 @@ class PlayerOptions
 		ZERO(m_bTransforms);
 		ZERO(m_fStealth);
 		ONE(m_SpeedfStealth);
+		ZERO(m_fConfusionZ);
+		ONE(m_SpeedfConfusionZ);
 	};
 	void Init();
 	void Approach(const PlayerOptions& other, float fDeltaSeconds);
@@ -136,6 +138,7 @@ class PlayerOptions
 		EFFECT_DRUNK,
 		EFFECT_DIZZY,
 		EFFECT_CONFUSION,
+		EFFECT_CONFUSION_OFFSET,
 		EFFECT_MINI,
 		EFFECT_TINY,
 		EFFECT_FLIP,
@@ -272,6 +275,7 @@ class PlayerOptions
 	bool m_bPractice{ false };
 
 	float m_fStealth[16], m_SpeedfStealth[16];
+	float m_fConfusionZ[16], m_SpeedfConfusionZ[16];
 
 	bool m_bCosecant{ false };
 	bool m_bStealthType{ false };

@@ -103,6 +103,8 @@ PlayerOptions::Init()
 	m_bCosecant = false;
 	ZERO(m_fStealth);
 	ONE(m_SpeedfStealth);
+	ZERO(m_fConfusionZ);
+	ONE(m_SpeedfConfusionZ);
 }
 
 void
@@ -149,6 +151,8 @@ PlayerOptions::Approach(const PlayerOptions& other, float fDeltaSeconds)
 	DO_COPY(m_MinTNSToHideNotes);
 	DO_COPY(m_sNoteSkin);
 	DO_COPY(m_bCosecant);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fConfusionZ[i]);
 	for (int i = 0; i < 16; i++)
 		APPROACH(fStealth[i]);
 	DO_COPY(m_bStealthType);
@@ -241,6 +245,7 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fEffects[EFFECT_DRUNK], "Drunk");
 	AddPart(AddTo, m_fEffects[EFFECT_DIZZY], "Dizzy");
 	AddPart(AddTo, m_fEffects[EFFECT_CONFUSION], "Confusion");
+	AddPart(AddTo, m_fEffects[EFFECT_CONFUSION_OFFSET], "ConfusionOffset");
 	AddPart(AddTo, m_fEffects[EFFECT_MINI], "Mini");
 	AddPart(AddTo, m_fEffects[EFFECT_TINY], "Tiny");
 	AddPart(AddTo, m_fEffects[EFFECT_FLIP], "Flip");
@@ -282,8 +287,9 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 
 	for (int i = 0; i < 16; i++) {
 		auto s = ssprintf("Stealth%d", i + 1);
-
 		AddPart(AddTo, m_fStealth[i], s);
+		s = ssprintf("ConfusionZOffset%d", i + 1);
+		AddPart(AddTo, m_fConfusionZ[i], s);
 	}
 
 	if (m_bTurns[TURN_MIRROR])
@@ -593,9 +599,21 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 		SET_FLOAT(fEffects[EFFECT_DRUNK])
 	else if (sBit == "dizzy")
 		SET_FLOAT(fEffects[EFFECT_DIZZY])
-	else if (sBit == "confusion")
-		SET_FLOAT(fEffects[EFFECT_CONFUSION])
-	else if (sBit == "mini")
+	else if (sBit.find("confusion") != sBit.npos) {
+		if (sBit == "confusion")
+			SET_FLOAT(fEffects[EFFECT_CONFUSION])
+		else if (sBit == "confusionoffset")
+			SET_FLOAT(fEffects[EFFECT_CONFUSION_OFFSET])
+		else {
+			for (int i = 0; i < 16; i++) {
+				sMod = ssprintf("confusionoffset%d", i + 1);
+				if (sBit == sMod) {
+					SET_FLOAT(fConfusionZ[i])
+					break;
+				}
+			}
+		}
+	} else if (sBit == "mini")
 		SET_FLOAT(fEffects[EFFECT_MINI])
 	else if (sBit == "tiny")
 		SET_FLOAT(fEffects[EFFECT_TINY])
@@ -1067,6 +1085,8 @@ PlayerOptions::operator==(const PlayerOptions& other) const
 		COMPARE(m_bTransforms[i]);
 	for (int i = 0; i < 16; ++i)
 		COMPARE(m_fStealth[i]);
+	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fConfusionZ[i]);
 #undef COMPARE
 	return true;
 }
@@ -1123,6 +1143,9 @@ PlayerOptions::operator=(PlayerOptions const& other)
 	}
 	for (auto i = 0; i < PlayerOptions::NUM_TRANSFORMS; ++i) {
 		CPY(m_bTransforms[i]);
+	}
+	for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fConfusionZ[i]);
 	}
 	for (int i = 0; i < 16; ++i) {
 		CPY_SPEED(fStealth[i]);
@@ -1421,6 +1444,9 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(Drunk, Effects[PlayerOptions::EFFECT_DRUNK], true);
 	FLOAT_INTERFACE(Dizzy, Effects[PlayerOptions::EFFECT_DIZZY], true);
 	FLOAT_INTERFACE(Confusion, Effects[PlayerOptions::EFFECT_CONFUSION], true);
+	FLOAT_INTERFACE(ConfusionOffset,
+					Effects[PlayerOptions::EFFECT_CONFUSION_OFFSET],
+					true);
 	FLOAT_INTERFACE(Mini, Effects[PlayerOptions::EFFECT_MINI], true);
 	FLOAT_INTERFACE(Tiny, Effects[PlayerOptions::EFFECT_TINY], true);
 	FLOAT_INTERFACE(Flip, Effects[PlayerOptions::EFFECT_FLIP], true);
@@ -1484,6 +1510,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	BOOL_INTERFACE(StealthPastReceptors, StealthPastReceptors);
 
 	MULTICOL_FLOAT_INTERFACE(Stealth, Stealth, true);
+	MULTICOL_FLOAT_INTERFACE(ConfusionOffset, ConfusionZ, true);
 
 	BOOL_INTERFACE(TurnNone, Turns[PlayerOptions::TURN_NONE]);
 	BOOL_INTERFACE(Mirror, Turns[PlayerOptions::TURN_MIRROR]);
@@ -1819,6 +1846,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Drunk);
 		ADD_METHOD(Dizzy);
 		ADD_METHOD(Confusion);
+		ADD_METHOD(ConfusionOffset); // functional, verified!
 		ADD_METHOD(Mini);
 		ADD_METHOD(Tiny);
 		ADD_METHOD(Flip);
@@ -1907,7 +1935,8 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Passmark);
 		ADD_METHOD(RandomSpeed);
 
-		ADD_MULTICOL_METHOD(Stealth); // functional, verified!
+		ADD_MULTICOL_METHOD(Stealth);		  // functional, verified!
+		ADD_MULTICOL_METHOD(ConfusionOffset); // functional, verified!
 
 		ADD_METHOD(NoteSkin);
 		ADD_METHOD(MuteOnError);
