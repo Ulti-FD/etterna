@@ -270,7 +270,7 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fEffects[EFFECT_TWIRL], "Twirl");
 	AddPart(AddTo, m_fEffects[EFFECT_ROLL], "Roll");
 	AddPart(AddTo, m_fEffects[EFFECT_ATTENUATE_X], "AttenuateX");
-	// AddPart( AddTo, m_fEffects[EFFECT_ATTENUATE_Y],		"AttenuateY" );
+	AddPart(AddTo, m_fEffects[EFFECT_ATTENUATE_Y], "AttenuateY");
 	// AddPart( AddTo, m_fEffects[EFFECT_ATTENUATE_Z],		"AttenuateZ" );
 
 	AddPart(AddTo, m_fAppearances[APPEARANCE_HIDDEN], "Hidden");
@@ -709,8 +709,8 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 	} else if (sBit.find("attenuate") != sBit.npos) {
 		if (sBit == "attenuatex")
 			SET_FLOAT(fEffects[EFFECT_ATTENUATE_X])
-		// else if( sBit == "attenuatey" )
-		//	SET_FLOAT( fEffects[EFFECT_ATTENUATE_Y] )
+		else if (sBit == "attenuatey")
+			SET_FLOAT(fEffects[EFFECT_ATTENUATE_Y])
 		// else if( sBit == "attenuatez" )
 		//	SET_FLOAT( fEffects[EFFECT_ATTENUATE_Z] )
 	}
@@ -1539,8 +1539,10 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(AttenuateX,
 					Effects[PlayerOptions::EFFECT_ATTENUATE_X],
 					true);
-	// FLOAT_INTERFACE(AttenuateY, Effects[PlayerOptions::EFFECT_ATTENUATE_Y],
-	// true); FLOAT_INTERFACE(AttenuateZ,
+	FLOAT_INTERFACE(AttenuateY,
+					Effects[PlayerOptions::EFFECT_ATTENUATE_Y],
+					true);
+	//  FLOAT_INTERFACE(AttenuateZ,
 	// Effects[PlayerOptions::EFFECT_ATTENUATE_Z], true);
 
 	FLOAT_INTERFACE(Hidden,
@@ -1948,8 +1950,8 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Xmode); // depends on player2, so broken, fix later mb
 		ADD_METHOD(Twirl);
 		ADD_METHOD(Roll);
-		ADD_METHOD(AttenuateX);
-		// ADD_METHOD(AttenuateY);
+		ADD_METHOD(AttenuateX); // functional, verified!
+		ADD_METHOD(AttenuateY); // functional, verified!
 		// ADD_METHOD(AttenuateZ);
 
 		ADD_METHOD(Hidden);

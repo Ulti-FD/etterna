@@ -351,8 +351,8 @@ NoteField::Update(float fDeltaTime)
 	if (!bTweeningOn && m_fCurrentBeatLastUpdate != -1) {
 		const auto fYOffsetLast =
 		  ArrowEffects::GetYOffset(m_pPlayerState, 0, m_fCurrentBeatLastUpdate);
-		const auto fYPosLast =
-		  ArrowEffects::GetYPos(0, fYOffsetLast, m_fYReverseOffsetPixels);
+		const auto fYPosLast = ArrowEffects::GetYPos(
+		  m_pPlayerState, 0, fYOffsetLast, m_fYReverseOffsetPixels);
 		const auto fPixelDifference = fYPosLast - m_fYPosCurrentBeatLastUpdate;
 
 		// LOG->Trace( "speed = %f, %f, %f, %f, %f, %f", fSpeed,
@@ -365,8 +365,8 @@ NoteField::Update(float fDeltaTime)
 	m_fCurrentBeatLastUpdate = fCurrentBeat;
 	const auto fYOffsetCurrent =
 	  ArrowEffects::GetYOffset(m_pPlayerState, 0, m_fCurrentBeatLastUpdate);
-	m_fYPosCurrentBeatLastUpdate =
-	  ArrowEffects::GetYPos(0, fYOffsetCurrent, m_fYReverseOffsetPixels);
+	m_fYPosCurrentBeatLastUpdate = ArrowEffects::GetYPos(
+	  m_pPlayerState, 0, fYOffsetCurrent, m_fYReverseOffsetPixels);
 
 	m_rectMarkerBar.Update(fDeltaTime);
 
@@ -416,8 +416,8 @@ NoteField::DrawBeatBar(const float fBeat, BeatBarType type, int iMeasureIndex)
 	const auto bIsMeasure = type == measure;
 
 	const auto fYOffset = ArrowEffects::GetYOffset(m_pPlayerState, 0, fBeat);
-	const auto fYPos =
-	  ArrowEffects::GetYPos(0, fYOffset, m_fYReverseOffsetPixels);
+	const auto fYPos = ArrowEffects::GetYPos(
+	  m_pPlayerState, 0, fYOffset, m_fYReverseOffsetPixels);
 
 	float fAlpha;
 	int iState;
@@ -481,7 +481,7 @@ NoteField::DrawBoard(int iDrawDistanceAfterTargetsPixels,
 		// Draw the board centered on fYPosAt0 so that the board doesn't slide
 		// as the draw distance changes with modifiers.
 		const auto fYPosAt0 =
-		  ArrowEffects::GetYPos(0, 0, m_fYReverseOffsetPixels);
+		  ArrowEffects::GetYPos(m_pPlayerState, 0, 0, m_fYReverseOffsetPixels);
 
 		auto rect = *pSprite->GetCurrentTextureCoordRect();
 		const auto fBoardGraphicHeightPixels = pSprite->GetUnzoomedHeight();
@@ -517,8 +517,8 @@ NoteField::DrawMarkerBar(int iBeat)
 {
 	const auto fBeat = NoteRowToBeat(iBeat);
 	const auto fYOffset = ArrowEffects::GetYOffset(m_pPlayerState, 0, fBeat);
-	const auto fYPos =
-	  ArrowEffects::GetYPos(0, fYOffset, m_fYReverseOffsetPixels);
+	const auto fYPos = ArrowEffects::GetYPos(
+	  m_pPlayerState, 0, fYOffset, m_fYReverseOffsetPixels);
 
 	m_rectMarkerBar.StretchTo(RectF(-GetWidth() / 2,
 									fYPos - ARROW_SIZE / 2,
@@ -536,12 +536,18 @@ NoteField::DrawAreaHighlight(int iStartBeat, int iEndBeat)
 	const auto fEndBeat = NoteRowToBeat(iEndBeat);
 	const auto fDrawDistanceAfterTargetsPixels =
 	  ArrowEffects::GetYOffset(m_pPlayerState, 0, fStartBeat);
-	const auto fYStartPos = ArrowEffects::GetYPos(
-	  0, fDrawDistanceAfterTargetsPixels, m_fYReverseOffsetPixels);
+	const auto fYStartPos =
+	  ArrowEffects::GetYPos(m_pPlayerState,
+							0,
+							fDrawDistanceAfterTargetsPixels,
+							m_fYReverseOffsetPixels);
 	const auto fDrawDistanceBeforeTargetsPixels =
 	  ArrowEffects::GetYOffset(m_pPlayerState, 0, fEndBeat);
-	const auto fYEndPos = ArrowEffects::GetYPos(
-	  0, fDrawDistanceBeforeTargetsPixels, m_fYReverseOffsetPixels);
+	const auto fYEndPos =
+	  ArrowEffects::GetYPos(m_pPlayerState,
+							0,
+							fDrawDistanceBeforeTargetsPixels,
+							m_fYReverseOffsetPixels);
 
 	// The caller should have clamped these to reasonable values
 	ASSERT(fYStartPos > -1000);
@@ -562,8 +568,8 @@ NoteField::set_text_measure_number_for_draw(const float beat,
 											const RageColor& glow)
 {
 	const auto y_offset = ArrowEffects::GetYOffset(m_pPlayerState, 0, beat);
-	const auto y_pos =
-	  ArrowEffects::GetYPos(0, y_offset, m_fYReverseOffsetPixels);
+	const auto y_pos = ArrowEffects::GetYPos(
+	  m_pPlayerState, 0, y_offset, m_fYReverseOffsetPixels);
 	const auto zoom = ArrowEffects::GetZoom(m_pPlayerState);
 	const auto x_base = GetWidth() * .5f;
 	x_offset *= zoom;

@@ -530,12 +530,16 @@ ArrowGetReverseShiftAndScale(int iCol,
 }
 
 float
-ArrowEffects::GetYPos(int iCol,
+ArrowEffects::GetYPos(const PlayerState* pPlayerState,
+					  int iCol,
 					  float fYOffset,
 					  float fYReverseOffsetPixels,
 					  bool WithReverse)
 {
 	auto f = fYOffset;
+
+	auto pStyle = GAMESTATE->GetCurrentStyle(pPlayerState->m_PlayerNumber);
+	const auto* const pCols = pStyle->m_ColumnInfo;
 
 	if (WithReverse) {
 		float fShift, fScale;
@@ -551,6 +555,13 @@ ArrowEffects::GetYPos(int iCol,
 	// checking whether tipsy is on. -Kyz
 	auto& data = g_EffectData;
 	f += fEffects[PlayerOptions::EFFECT_TIPSY] * data.m_tipsy_result[iCol];
+
+	if (fEffects[PlayerOptions::EFFECT_ATTENUATE_Y] != 0) {
+		const float fXOffset = pCols[iCol].fXOffset;
+		f += fEffects[PlayerOptions::EFFECT_ATTENUATE_Y] *
+			 (fYOffset / ARROW_SIZE) * (fYOffset / ARROW_SIZE) *
+			 (fXOffset / ARROW_SIZE);
+	}
 
 	// In beware's DDR Extreme-focused fork of StepMania 3.9, this value is
 	// floored, making arrows show on integer Y coordinates. Supposedly it makes
@@ -590,11 +601,11 @@ ArrowEffects::GetXPos(const PlayerState* pPlayerState,
 {
 	float fPixelOffsetFromCenter = 0; // fill this in below
 
-	auto pStyle = GAMESTATE->GetCurrentStyle(pPlayerState->m_PlayerNumber);
 	const auto* const fEffects = curr_options->m_fEffects;
-
-	const auto* const pCols = pStyle->m_ColumnInfo;
 	auto& data = g_EffectData;
+
+	auto pStyle = GAMESTATE->GetCurrentStyle(pPlayerState->m_PlayerNumber);
+	const auto* const pCols = pStyle->m_ColumnInfo;
 
 	if (fEffects[PlayerOptions::EFFECT_TORNADO] != 0) {
 		const auto fRealPixelOffset =
@@ -930,7 +941,8 @@ ArrowGetPercentVisible(float fYPosWithoutReverse, int iCol, float fYOffset)
 }
 
 float
-ArrowEffects::GetAlpha(int iCol,
+ArrowEffects::GetAlpha(const PlayerState* pPlayerState,
+					   int iCol,
 					   float fYOffset,
 					   float fPercentFadeToFail,
 					   float fYReverseOffsetPixels,
@@ -939,7 +951,7 @@ ArrowEffects::GetAlpha(int iCol,
 {
 	// Get the YPos without reverse (that is, factor in EFFECT_TIPSY).
 	const auto fYPosWithoutReverse =
-	  GetYPos(iCol, fYOffset, fYReverseOffsetPixels, false);
+	  GetYPos(pPlayerState, iCol, fYOffset, fYReverseOffsetPixels, false);
 
 	auto fPercentVisible =
 	  ArrowGetPercentVisible(fYPosWithoutReverse, iCol, fYOffset);
@@ -961,7 +973,8 @@ ArrowEffects::GetAlpha(int iCol,
 }
 
 float
-ArrowEffects::GetGlow(int iCol,
+ArrowEffects::GetGlow(const PlayerState* pPlayerState,
+					  int iCol,
 					  float fYOffset,
 					  float fPercentFadeToFail,
 					  float fYReverseOffsetPixels,
@@ -970,7 +983,7 @@ ArrowEffects::GetGlow(int iCol,
 {
 	// Get the YPos without reverse (that is, factor in EFFECT_TIPSY).
 	const auto fYPosWithoutReverse =
-	  GetYPos(iCol, fYOffset, fYReverseOffsetPixels, false);
+	  GetYPos(pPlayerState, iCol, fYOffset, fYReverseOffsetPixels, false);
 
 	auto fPercentVisible =
 	  ArrowGetPercentVisible(fYPosWithoutReverse, iCol, fYOffset);
@@ -1147,7 +1160,8 @@ GetYPos(lua_State* L)
 	const auto fYReverseOffsetPixels = YReverseOffset(L, 4);
 	ArrowEffects::SetCurrentOptions(&ps->m_PlayerOptions.GetCurrent());
 	lua_pushnumber(
-	  L, ArrowEffects::GetYPos(IArg(2) - 1, FArg(3), fYReverseOffsetPixels));
+	  L,
+	  ArrowEffects::GetYPos(ps, IArg(2) - 1, FArg(3), fYReverseOffsetPixels));
 	return 1;
 }
 
@@ -1255,7 +1269,8 @@ GetAlpha(lua_State* L)
 		fFadeInPercentOfDrawFar = FArg(7);
 	}
 	lua_pushnumber(L,
-				   ArrowEffects::GetAlpha(IArg(2) - 1,
+				   ArrowEffects::GetAlpha(ps,
+										  IArg(2) - 1,
 										  FArg(3),
 										  fPercentFadeToFail,
 										  fYReverseOffsetPixels,
@@ -1287,7 +1302,8 @@ GetGlow(lua_State* L)
 		fFadeInPercentOfDrawFar = FArg(7);
 	}
 	lua_pushnumber(L,
-				   ArrowEffects::GetGlow(IArg(2) - 1,
+				   ArrowEffects::GetGlow(ps,
+										 IArg(2) - 1,
 										 FArg(3),
 										 fPercentFadeToFail,
 										 fYReverseOffsetPixels,

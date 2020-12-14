@@ -832,14 +832,16 @@ ArrowGetAlphaOrGlow(bool bGlow,
 					float fFadeInPercentOfDrawFar)
 {
 	if (bGlow)
-		return ArrowEffects::GetGlow(iCol,
+		return ArrowEffects::GetGlow(pPlayerState,
+									 iCol,
 									 fYOffset,
 									 fPercentFadeToFail,
 									 fYReverseOffsetPixels,
 									 fDrawDistanceBeforeTargetsPixels,
 									 fFadeInPercentOfDrawFar);
 
-	return ArrowEffects::GetAlpha(iCol,
+	return ArrowEffects::GetAlpha(pPlayerState,
+								  iCol,
 								  fYOffset,
 								  fPercentFadeToFail,
 								  fYReverseOffsetPixels,
@@ -1343,11 +1345,13 @@ NoteDisplay::DrawHoldBody(const TapNote& tn,
 	  pSpriteBottom->GetUnzoomedHeight() * ae_zoom;
 
 	part_args.y_start_pos =
-	  ArrowEffects::GetYPos(column_args.column,
+	  ArrowEffects::GetYPos(m_pPlayerState,
+							column_args.column,
 							field_args.draw_pixels_after_targets,
 							m_fYReverseOffsetPixels);
 	part_args.y_end_pos =
-	  ArrowEffects::GetYPos(column_args.column,
+	  ArrowEffects::GetYPos(m_pPlayerState,
+							column_args.column,
 							field_args.draw_pixels_before_targets,
 							m_fYReverseOffsetPixels);
 	if (reverse) {
@@ -1468,10 +1472,12 @@ NoteDisplay::DrawHold(const TapNote& tn,
 	if (bReverse)
 		std::swap(fStartYOffset, fEndYOffset);
 
-	const auto fYHead = ArrowEffects::GetYPos(
-	  column_args.column, fStartYOffset, m_fYReverseOffsetPixels);
+	const auto fYHead = ArrowEffects::GetYPos(m_pPlayerState,
+											  column_args.column,
+											  fStartYOffset,
+											  m_fYReverseOffsetPixels);
 	const auto fYTail = ArrowEffects::GetYPos(
-	  column_args.column, fEndYOffset, m_fYReverseOffsetPixels);
+	  m_pPlayerState, column_args.column, fEndYOffset, m_fYReverseOffsetPixels);
 
 	const auto fColorScale = SCALE(
 	  tn.HoldResult.fLife, 0.0f, 1.0f, cache->m_fHoldLetGoGrayPercent, 1.0f);
@@ -1585,14 +1591,16 @@ NoteDisplay::DrawActor(const TapNote& tn,
 	}
 
 	const auto fAlpha =
-	  ArrowEffects::GetAlpha(column_args.column,
+	  ArrowEffects::GetAlpha(m_pPlayerState,
+							 column_args.column,
 							 fYOffset,
 							 fPercentFadeToFail,
 							 m_fYReverseOffsetPixels,
 							 field_args.draw_pixels_before_targets,
 							 field_args.fade_before_targets);
 	const auto fGlow =
-	  ArrowEffects::GetGlow(column_args.column,
+	  ArrowEffects::GetGlow(m_pPlayerState,
+							column_args.column,
 							fYOffset,
 							fPercentFadeToFail,
 							m_fYReverseOffsetPixels,

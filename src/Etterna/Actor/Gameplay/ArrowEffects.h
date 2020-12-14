@@ -45,7 +45,8 @@ class ArrowEffects
 						  bool with_reverse = true)
 	{
 		ret.x = GetXPos(player_state, col, y_offset);
-		ret.y = GetYPos(col, y_offset, y_reverse_offset, with_reverse);
+		ret.y =
+		  GetYPos(player_state, col, y_offset, y_reverse_offset, with_reverse);
 		ret.z = GetZPos(col, y_offset);
 	}
 
@@ -59,7 +60,8 @@ class ArrowEffects
 	 * @param fYReverseOffsetPixels the amount offset due to reverse.
 	 * @param WithReverse a flag to see if the Reverse mod is on.
 	 * @return the actual display position. */
-	static auto GetYPos(int iCol,
+	static auto GetYPos(const PlayerState* pPlayerState,
+						int iCol,
 						float fYOffset,
 						float fYReverseOffsetPixels,
 						bool WithReverse = true) -> float;
@@ -115,7 +117,8 @@ class ArrowEffects
 
 	// fAlpha is the transparency of the arrow.  It depends on fYPos and the
 	// AppearanceType.
-	static auto GetAlpha(int iCol,
+	static auto GetAlpha(const PlayerState* pPlayerState,
+						 int iCol,
 						 float fYPos,
 						 float fPercentFadeToFail,
 						 float fYReverseOffsetPixels,
@@ -124,7 +127,8 @@ class ArrowEffects
 
 	// fAlpha is the transparency of the arrow.  It depends on fYPos and the
 	// AppearanceType.
-	static auto GetGlow(int iCol,
+	static auto GetGlow(const PlayerState* pPlayerState,
+						int iCol,
 						float fYPos,
 						float fPercentFadeToFail,
 						float fYReverseOffsetPixels,
