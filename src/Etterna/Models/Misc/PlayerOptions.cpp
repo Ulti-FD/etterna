@@ -115,6 +115,8 @@ PlayerOptions::Init()
 	ONE(m_SpeedfConfusionZ);
 	ZERO(m_fStealth);
 	ONE(m_SpeedfStealth);
+	ZERO(m_fReverse);
+	ONE(m_SpeedfReverse);
 }
 
 void
@@ -175,6 +177,8 @@ PlayerOptions::Approach(const PlayerOptions& other, float fDeltaSeconds)
 		APPROACH(fConfusionZ[i]);
 	for (int i = 0; i < 16; i++)
 		APPROACH(fStealth[i]);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fReverse[i]);
 	DO_COPY(m_bStealthType);
 	DO_COPY(m_bStealthPastReceptors);
 #undef APPROACH
@@ -333,6 +337,8 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 		AddPart(AddTo, m_fConfusionY[i], s);
 		s = ssprintf("ConfusionZOffset%d", i + 1);
 		AddPart(AddTo, m_fConfusionZ[i], s);
+		s = ssprintf("Reverse%d", i + 1);
+		AddPart(AddTo, m_fReverse[i], s);
 	}
 
 	if (m_bTurns[TURN_MIRROR])
@@ -812,9 +818,19 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 		m_bTransforms[TRANSFORM_NOHANDS] = on;
 	else if (sBit == "noquads")
 		m_bTransforms[TRANSFORM_NOQUADS] = on;
-	else if (sBit == "reverse")
-		SET_FLOAT(fScrolls[SCROLL_REVERSE])
-	else if (sBit == "split")
+	else if (sBit.find("reverse") != sBit.npos) {
+		if (sBit == "reverse")
+			SET_FLOAT(fScrolls[SCROLL_REVERSE])
+		else {
+			for (int i = 0; i < 16; i++) {
+				sMod = ssprintf("reverse%d", i + 1);
+				if (sBit == sMod) {
+					SET_FLOAT(fReverse[i])
+					break;
+				}
+			}
+		}
+	} else if (sBit == "split")
 		SET_FLOAT(fScrolls[SCROLL_SPLIT])
 	else if (sBit == "alternate")
 		SET_FLOAT(fScrolls[SCROLL_ALTERNATE])
@@ -1134,10 +1150,10 @@ PlayerOptions::GetReversePercentForColumn(int iCol) const
 	const auto iNumCols = GAMESTATE->GetNumCols(m_pn);
 
 	f += m_fScrolls[SCROLL_REVERSE];
+	f += m_fReverse[iCol];
 
 	if (iCol >= iNumCols / 2)
 		f += m_fScrolls[SCROLL_SPLIT];
-
 	if ((iCol % 2) == 1)
 		f += m_fScrolls[SCROLL_ALTERNATE];
 
@@ -1216,6 +1232,8 @@ PlayerOptions::operator==(const PlayerOptions& other) const
 		COMPARE(m_fConfusionZ[i]);
 	for (int i = 0; i < 16; ++i)
 		COMPARE(m_fStealth[i]);
+	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fReverse[i]);
 #undef COMPARE
 	return true;
 }
@@ -1293,6 +1311,9 @@ PlayerOptions::operator=(PlayerOptions const& other)
 	}
 	for (int i = 0; i < 16; ++i) {
 		CPY_SPEED(fStealth[i]);
+	}
+	for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fReverse[i]);
 	}
 #undef CPY
 #undef CPY_SPEED
@@ -1695,6 +1716,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	MULTICOL_FLOAT_INTERFACE(ConfusionYOffset, ConfusionY, true);
 	MULTICOL_FLOAT_INTERFACE(ConfusionOffset, ConfusionZ, true);
 	MULTICOL_FLOAT_INTERFACE(Stealth, Stealth, true);
+	MULTICOL_FLOAT_INTERFACE(Reverse, Reverse, true);
 
 	BOOL_INTERFACE(TurnNone, Turns[PlayerOptions::TURN_NONE]);
 	BOOL_INTERFACE(Mirror, Turns[PlayerOptions::TURN_MIRROR]);
@@ -2137,12 +2159,13 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_MULTICOL_METHOD(MoveX);
 		ADD_MULTICOL_METHOD(MoveY);
 		ADD_MULTICOL_METHOD(MoveZ);
-		ADD_MULTICOL_METHOD(ConfusionOffset); // functional, verified!
-		ADD_MULTICOL_METHOD(
-		  ConfusionXOffset); // functional and verified
-							 // but doesn't auto reset to 0? investigate
+		ADD_MULTICOL_METHOD(ConfusionOffset);  // functional, verified!
+		ADD_MULTICOL_METHOD(ConfusionXOffset); // functional and verified
+											   // but doesn't auto reset
+											   // to 0? investigate
 		ADD_MULTICOL_METHOD(ConfusionYOffset); // functional, verified!
 		ADD_MULTICOL_METHOD(Stealth);		   // functional, verified!
+		ADD_MULTICOL_METHOD(Reverse);
 
 		ADD_METHOD(NoteSkin);
 		ADD_METHOD(MuteOnError);
