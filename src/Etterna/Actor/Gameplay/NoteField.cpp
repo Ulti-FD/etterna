@@ -406,7 +406,7 @@ NoteField::GetWidth() const
 	// TODO: Remove use of PlayerNumber.
 	pStyle->GetMinAndMaxColX(m_pPlayerState->m_PlayerNumber, fMinX, fMaxX);
 
-	const auto fYZoom = ArrowEffects::GetZoom(m_pPlayerState);
+	const auto fYZoom = ArrowEffects::GetZoom(m_pPlayerState, 0);
 	return (fMaxX - fMinX + ARROW_SIZE) * fYZoom;
 }
 
@@ -570,7 +570,7 @@ NoteField::set_text_measure_number_for_draw(const float beat,
 	const auto y_offset = ArrowEffects::GetYOffset(m_pPlayerState, 0, beat);
 	const auto y_pos = ArrowEffects::GetYPos(
 	  m_pPlayerState, 0, y_offset, m_fYReverseOffsetPixels);
-	const auto zoom = ArrowEffects::GetZoom(m_pPlayerState);
+	const auto zoom = ArrowEffects::GetZoom(m_pPlayerState, 0);
 	const auto x_base = GetWidth() * .5f;
 	x_offset *= zoom;
 

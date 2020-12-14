@@ -152,7 +152,7 @@ class ArrowEffects
 	  -> float;
 
 	// This is the zoom of the individual tracks, not of the whole Player.
-	static auto GetZoom(const PlayerState* pPlayerState) -> float;
+	static auto GetZoom(const PlayerState* pPlayerState, int iCol) -> float;
 
 	static auto GetFrameWidthScale(const PlayerState* pPlayerState,
 								   float fYOffset,

@@ -74,6 +74,10 @@ class PlayerOptions
 		ONE(m_SpeedfMovesY);
 		ZERO(m_fMovesZ);
 		ONE(m_SpeedfMovesZ);
+		ZERO(m_fBumpy);
+		ONE(m_SpeedfBumpy);
+		ZERO(m_fTiny);
+		ONE(m_SpeedfTiny);
 		ZERO(m_fConfusionX);
 		ONE(m_SpeedfConfusionX);
 		ZERO(m_fConfusionY);
@@ -303,6 +307,8 @@ class PlayerOptions
 	float m_fMovesX[16], m_SpeedfMovesX[16];
 	float m_fMovesY[16], m_SpeedfMovesY[16];
 	float m_fMovesZ[16], m_SpeedfMovesZ[16];
+	float m_fBumpy[16], m_SpeedfBumpy[16];
+	float m_fTiny[16], m_SpeedfTiny[16];
 	float m_fConfusionX[16], m_SpeedfConfusionX[16];
 	float m_fConfusionY[16], m_SpeedfConfusionY[16];
 	float m_fConfusionZ[16], m_SpeedfConfusionZ[16];

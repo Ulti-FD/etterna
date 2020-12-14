@@ -1060,6 +1060,10 @@ ArrowEffects::GetZPos(const PlayerState* pPlayerState, int iCol, float fYOffset)
 		fZPos += fEffects[PlayerOptions::EFFECT_BUMPY] * 40 *
 				 RageFastSin(fYOffset / 16.0f);
 
+	if (curr_options->m_fBumpy[iCol] != 0)
+		fZPos +=
+		  curr_options->m_fBumpy[iCol] * 40 * RageFastSin(fYOffset / 16.0f);
+
 	if (fEffects[PlayerOptions::EFFECT_ATTENUATE_Z] != 0) {
 		const float fXOffset = pCols[iCol].fXOffset;
 		fZPos += fEffects[PlayerOptions::EFFECT_ATTENUATE_Z] *
@@ -1092,7 +1096,7 @@ ArrowEffects::NeedZBuffer()
 }
 
 float
-ArrowEffects::GetZoom(const PlayerState* pPlayerState)
+ArrowEffects::GetZoom(const PlayerState* pPlayerState, int iCol)
 {
 	auto fZoom = 1.0f;
 	// Design change:  Instead of having a flag in the style that toggles a
@@ -1104,6 +1108,10 @@ ArrowEffects::GetZoom(const PlayerState* pPlayerState)
 	auto fTinyPercent = curr_options->m_fEffects[PlayerOptions::EFFECT_TINY];
 	if (fTinyPercent != 0) {
 		fTinyPercent = powf(0.5f, fTinyPercent);
+		fZoom *= fTinyPercent;
+	}
+	if (curr_options->m_fTiny[iCol] != 0) {
+		fTinyPercent = powf(0.5f, curr_options->m_fTiny[iCol]);
 		fZoom *= fTinyPercent;
 	}
 	return fZoom;
@@ -1387,13 +1395,13 @@ NeedZBuffer(lua_State* L)
 	return 1;
 }
 
-// ( PlayerState ps )
+// ( PlayerState ps, int iCol )
 int
 GetZoom(lua_State* L)
 {
 	auto* ps = Luna<PlayerState>::check(L, 1);
 	ArrowEffects::SetCurrentOptions(&ps->m_PlayerOptions.GetCurrent());
-	lua_pushnumber(L, ArrowEffects::GetZoom(ps));
+	lua_pushnumber(L, ArrowEffects::GetZoom(ps, IArg(2) - 1));
 	return 1;
 }
 

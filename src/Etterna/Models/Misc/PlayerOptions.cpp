@@ -107,6 +107,10 @@ PlayerOptions::Init()
 	ONE(m_SpeedfMovesY);
 	ZERO(m_fMovesZ);
 	ONE(m_SpeedfMovesZ);
+	ZERO(m_fBumpy);
+	ONE(m_SpeedfBumpy);
+	ZERO(m_fTiny);
+	ONE(m_SpeedfTiny);
 	ZERO(m_fConfusionZ);
 	ONE(m_SpeedfConfusionZ);
 	ZERO(m_fConfusionY);
@@ -169,6 +173,10 @@ PlayerOptions::Approach(const PlayerOptions& other, float fDeltaSeconds)
 		APPROACH(fMovesY[i]);
 	for (int i = 0; i < 16; i++)
 		APPROACH(fMovesZ[i]);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fBumpy[i]);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fTiny[i]);
 	for (int i = 0; i < 16; i++)
 		APPROACH(fConfusionX[i]);
 	for (int i = 0; i < 16; i++)
@@ -331,6 +339,10 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 		AddPart(AddTo, m_fMovesZ[i], s);
 		s = ssprintf("Stealth%d", i + 1);
 		AddPart(AddTo, m_fStealth[i], s);
+		s = ssprintf("Bumpy%d", i + 1);
+		AddPart(AddTo, m_fBumpy[i], s);
+		s = ssprintf("Tiny%d", i + 1);
+		AddPart(AddTo, m_fTiny[i], s);
 		s = ssprintf("ConfusionXOffset%d", i + 1);
 		AddPart(AddTo, m_fConfusionX[i], s);
 		s = ssprintf("ConfusionYOffset%d", i + 1);
@@ -692,9 +704,19 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 		}
 	} else if (sBit == "mini")
 		SET_FLOAT(fEffects[EFFECT_MINI])
-	else if (sBit == "tiny")
-		SET_FLOAT(fEffects[EFFECT_TINY])
-	else if (sBit == "flip")
+	else if (sBit.find("tiny") != sBit.npos) {
+		if (sBit == "tiny")
+			SET_FLOAT(fEffects[EFFECT_TINY])
+		else {
+			for (int i = 0; i < 16; i++) {
+				sMod = ssprintf("tiny%d", i + 1);
+				if (sBit == sMod) {
+					SET_FLOAT(fTiny[i])
+					break;
+				}
+			}
+		}
+	} else if (sBit == "flip")
 		SET_FLOAT(fEffects[EFFECT_FLIP])
 	else if (sBit == "invert")
 		SET_FLOAT(fEffects[EFFECT_INVERT])
@@ -702,9 +724,19 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 		SET_FLOAT(fEffects[EFFECT_TORNADO])
 	else if (sBit == "tipsy")
 		SET_FLOAT(fEffects[EFFECT_TIPSY])
-	else if (sBit == "bumpy")
-		SET_FLOAT(fEffects[EFFECT_BUMPY])
-	else if (sBit == "beat")
+	else if (sBit.find("bumpy") != sBit.npos) {
+		if (sBit == "bumpy")
+			SET_FLOAT(fEffects[EFFECT_BUMPY])
+		else {
+			for (int i = 0; i < 16; i++) {
+				sMod = ssprintf("bumpy%d", i + 1);
+				if (sBit == sMod) {
+					SET_FLOAT(fBumpy[i])
+					break;
+				}
+			}
+		}
+	} else if (sBit == "beat")
 		SET_FLOAT(fEffects[EFFECT_BEAT])
 	else if (sBit == "xmode")
 		SET_FLOAT(fEffects[EFFECT_XMODE])
@@ -1225,6 +1257,10 @@ PlayerOptions::operator==(const PlayerOptions& other) const
 	for (int i = 0; i < 16; ++i)
 		COMPARE(m_fMovesZ[i]);
 	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fBumpy[i]);
+	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fTiny[i]);
+	for (int i = 0; i < 16; ++i)
 		COMPARE(m_fConfusionX[i]);
 	for (int i = 0; i < 16; ++i)
 		COMPARE(m_fConfusionY[i]);
@@ -1299,6 +1335,12 @@ PlayerOptions::operator=(PlayerOptions const& other)
 	}
 	for (int i = 0; i < 16; ++i) {
 		CPY_SPEED(fMovesZ[i]);
+	}
+	for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fBumpy[i]);
+	}
+	for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fTiny[i]);
 	}
 	for (int i = 0; i < 16; ++i) {
 		CPY_SPEED(fConfusionX[i]);
@@ -1712,6 +1754,8 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	MULTICOL_FLOAT_INTERFACE(MoveX, MovesX, true);
 	MULTICOL_FLOAT_INTERFACE(MoveY, MovesY, true);
 	MULTICOL_FLOAT_INTERFACE(MoveZ, MovesZ, true);
+	MULTICOL_FLOAT_INTERFACE(Bumpy, Bumpy, true);
+	MULTICOL_FLOAT_INTERFACE(Tiny, Tiny, true);
 	MULTICOL_FLOAT_INTERFACE(ConfusionXOffset, ConfusionX, true);
 	MULTICOL_FLOAT_INTERFACE(ConfusionYOffset, ConfusionY, true);
 	MULTICOL_FLOAT_INTERFACE(ConfusionOffset, ConfusionZ, true);
@@ -2156,16 +2200,18 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Passmark);
 		ADD_METHOD(RandomSpeed);
 
-		ADD_MULTICOL_METHOD(MoveX);
-		ADD_MULTICOL_METHOD(MoveY);
-		ADD_MULTICOL_METHOD(MoveZ);
+		ADD_MULTICOL_METHOD(MoveX); // functional, verified!
+		ADD_MULTICOL_METHOD(MoveY); // functional, verified!
+		ADD_MULTICOL_METHOD(MoveZ); // functional, verified!
+		ADD_MULTICOL_METHOD(Bumpy);
+		ADD_MULTICOL_METHOD(Tiny);
 		ADD_MULTICOL_METHOD(ConfusionOffset);  // functional, verified!
 		ADD_MULTICOL_METHOD(ConfusionXOffset); // functional and verified
 											   // but doesn't auto reset
 											   // to 0? investigate
 		ADD_MULTICOL_METHOD(ConfusionYOffset); // functional, verified!
 		ADD_MULTICOL_METHOD(Stealth);		   // functional, verified!
-		ADD_MULTICOL_METHOD(Reverse);
+		ADD_MULTICOL_METHOD(Reverse);		   // functional, verified!
 
 		ADD_METHOD(NoteSkin);
 		ADD_METHOD(MuteOnError);

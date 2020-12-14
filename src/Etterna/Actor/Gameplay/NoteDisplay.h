@@ -183,7 +183,8 @@ struct NoteColumnRenderArgs
 	void spae_zoom_for_beat(const PlayerState* state,
 							float beat,
 							RageVector3& sp_zoom,
-							RageVector3& ae_zoom) const;
+							RageVector3& ae_zoom,
+							int col_num) const;
 	static void SetPRZForActor(Actor* actor,
 							   const RageVector3& sp_pos,
 							   const RageVector3& ae_pos,

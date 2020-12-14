@@ -428,14 +428,17 @@ void
 NoteColumnRenderArgs::spae_zoom_for_beat(const PlayerState* state,
 										 float beat,
 										 RageVector3& sp_zoom,
-										 RageVector3& ae_zoom) const
+										 RageVector3& ae_zoom,
+										 int col_num) const
 {
 	switch (zoom_handler->m_spline_mode) {
 		case NCSM_Disabled:
-			ae_zoom.x = ae_zoom.y = ae_zoom.z = ArrowEffects::GetZoom(state);
+			ae_zoom.x = ae_zoom.y = ae_zoom.z =
+			  ArrowEffects::GetZoom(state, col_num);
 			break;
 		case NCSM_Offset:
-			ae_zoom.x = ae_zoom.y = ae_zoom.z = ArrowEffects::GetZoom(state);
+			ae_zoom.x = ae_zoom.y = ae_zoom.z =
+			  ArrowEffects::GetZoom(state, col_num);
 			zoom_handler->EvalForBeat(song_beat, beat, sp_zoom);
 			break;
 		case NCSM_Position:
@@ -888,7 +891,7 @@ NoteDisplay::DrawHoldPart(vector<Sprite*>& vpSpr,
 {
 	ASSERT(!vpSpr.empty());
 
-	auto ae_zoom = ArrowEffects::GetZoom(m_pPlayerState);
+	auto ae_zoom = ArrowEffects::GetZoom(m_pPlayerState, column_args.column);
 	auto* pSprite = vpSpr.front();
 
 	// draw manually in small segments
@@ -1339,7 +1342,8 @@ NoteDisplay::DrawHoldBody(const TapNote& tn,
 		y_tail += cache->m_iStopDrawingHoldBodyOffsetFromTail;
 	}
 
-	const auto ae_zoom = ArrowEffects::GetZoom(m_pPlayerState);
+	const auto ae_zoom =
+	  ArrowEffects::GetZoom(m_pPlayerState, column_args.column);
 	const auto frame_height_top = pSpriteTop->GetUnzoomedHeight() * ae_zoom;
 	const auto frame_height_bottom =
 	  pSpriteBottom->GetUnzoomedHeight() * ae_zoom;
@@ -1676,7 +1680,7 @@ NoteDisplay::DrawActor(const TapNote& tn,
 			break;
 	}
 	column_args.spae_zoom_for_beat(
-	  m_pPlayerState, spline_beat, sp_zoom, ae_zoom);
+	  m_pPlayerState, spline_beat, sp_zoom, ae_zoom, column_args.column);
 	column_args.SetPRZForActor(
 	  pActor, sp_pos, ae_pos, sp_rot, ae_rot, sp_zoom, ae_zoom);
 	// [AJ] this two lines (and how they're handled) piss off many people:
@@ -1885,11 +1889,11 @@ NoteColumnRenderer::UpdateReceptorGhostStuff(Actor* receptor) const
 	switch (NCR_current.m_zoom_handler.m_spline_mode) {
 		case NCSM_Disabled:
 			ae_zoom.x = ae_zoom.y = ae_zoom.z =
-			  ArrowEffects::GetZoom(player_state);
+			  ArrowEffects::GetZoom(player_state, m_column);
 			break;
 		case NCSM_Offset:
 			ae_zoom.x = ae_zoom.y = ae_zoom.z =
-			  ArrowEffects::GetZoom(player_state);
+			  ArrowEffects::GetZoom(player_state, m_column);
 			NCR_current.m_zoom_handler.EvalForReceptor(song_beat, sp_zoom);
 			break;
 		case NCSM_Position:
