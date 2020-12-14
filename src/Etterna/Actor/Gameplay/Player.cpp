@@ -848,7 +848,7 @@ Player::UpdateVisibleParts()
 			// GRAY_ARROWS_Y_STANDARD, GRAY_ARROWS_Y_REVERSE );
 
 			auto fX = ArrowEffects::GetXPos(m_pPlayerState, c, 0);
-			const auto fZ = ArrowEffects::GetZPos(c, 0);
+			const auto fZ = ArrowEffects::GetZPos(m_pPlayerState, c, 0);
 			fX *= (1 - fMiniPercent * 0.5F);
 
 			m_vpHoldJudgment[c]->SetX(fX);

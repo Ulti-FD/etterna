@@ -47,7 +47,7 @@ class ArrowEffects
 		ret.x = GetXPos(player_state, col, y_offset);
 		ret.y =
 		  GetYPos(player_state, col, y_offset, y_reverse_offset, with_reverse);
-		ret.z = GetZPos(col, y_offset);
+		ret.z = GetZPos(player_state, col, y_offset);
 	}
 
 	/**
@@ -110,7 +110,8 @@ class ArrowEffects
 	 * @param iCol the specific arrow column.
 	 * @param fYPos the Y position of the arrow.
 	 * @return the Z position. */
-	static auto GetZPos(int iCol, float fYPos) -> float;
+	static auto GetZPos(const PlayerState* pPlayerState, int iCol, float fYPos)
+	  -> float;
 
 	// Enable this if any ZPos effects are enabled.
 	static auto NeedZBuffer() -> bool;

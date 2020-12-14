@@ -160,7 +160,7 @@ class PlayerOptions
 		EFFECT_ROLL,
 		EFFECT_ATTENUATE_X,
 		EFFECT_ATTENUATE_Y,
-		// EFFECT_ATTENUATE_Z,
+		EFFECT_ATTENUATE_Z,
 		NUM_EFFECTS
 	};
 	/** @brief The various appearance mods. */

@@ -1011,14 +1011,24 @@ ArrowEffects::GetBrightness(const PlayerState* pPlayerState, float fNoteBeat)
 }
 
 float
-ArrowEffects::GetZPos(int iCol, float fYOffset)
+ArrowEffects::GetZPos(const PlayerState* pPlayerState, int iCol, float fYOffset)
 {
 	float fZPos = 0;
 	const auto* const fEffects = curr_options->m_fEffects;
 
+	auto pStyle = GAMESTATE->GetCurrentStyle(pPlayerState->m_PlayerNumber);
+	const auto* const pCols = pStyle->m_ColumnInfo;
+
 	if (fEffects[PlayerOptions::EFFECT_BUMPY] != 0)
 		fZPos += fEffects[PlayerOptions::EFFECT_BUMPY] * 40 *
 				 RageFastSin(fYOffset / 16.0f);
+
+	if (fEffects[PlayerOptions::EFFECT_ATTENUATE_Z] != 0) {
+		const float fXOffset = pCols[iCol].fXOffset;
+		fZPos += fEffects[PlayerOptions::EFFECT_ATTENUATE_Z] *
+				 (fYOffset / ARROW_SIZE) * (fYOffset / ARROW_SIZE) *
+				 (fXOffset / ARROW_SIZE);
+	}
 
 	return fZPos;
 }
@@ -1030,9 +1040,10 @@ ArrowEffects::NeedZBuffer()
 	// We also need to use the Z buffer if twirl is in play, because of
 	// hold modulation. -vyhd (OpenITG r623)
 	if (fEffects[PlayerOptions::EFFECT_BUMPY] != 0 ||
-		fEffects[PlayerOptions::EFFECT_TWIRL] != 0) {
+		fEffects[PlayerOptions::EFFECT_TWIRL] != 0)
 		return true;
-	}
+	if (fEffects[PlayerOptions::EFFECT_ATTENUATE_Z] != 0)
+		return true;
 	return false;
 }
 
@@ -1194,7 +1205,7 @@ GetZPos(lua_State* L)
 {
 	auto* ps = Luna<PlayerState>::check(L, 1);
 	ArrowEffects::SetCurrentOptions(&ps->m_PlayerOptions.GetCurrent());
-	lua_pushnumber(L, ArrowEffects::GetZPos(IArg(2) - 1, FArg(3)));
+	lua_pushnumber(L, ArrowEffects::GetZPos(ps, IArg(2) - 1, FArg(3)));
 	return 1;
 }
 
