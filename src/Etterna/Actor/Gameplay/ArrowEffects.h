@@ -44,10 +44,11 @@ class ArrowEffects
 						  RageVector3& ret,
 						  bool with_reverse = true)
 	{
-		ret.x = GetXPos(player_state, col, y_offset);
+		ret.x = GetMoveX(col) + GetXPos(player_state, col, y_offset);
 		ret.y =
+		  GetMoveY(col) +
 		  GetYPos(player_state, col, y_offset, y_reverse_offset, with_reverse);
-		ret.z = GetZPos(player_state, col, y_offset);
+		ret.z = GetMoveZ(col) + GetZPos(player_state, col, y_offset);
 	}
 
 	/**
@@ -95,6 +96,10 @@ class ArrowEffects
 	  -> float;
 	static auto ReceptorGetRotationY(const PlayerState* pPlayerState, int iCol)
 	  -> float;
+
+	static auto GetMoveX(int iCol) -> float;
+	static auto GetMoveY(int iCol) -> float;
+	static auto GetMoveZ(int iCol) -> float;
 
 	// fXPos is a horizontal position in pixels relative to the center of the
 	// field. This depends on the column of the arrow and possibly the Arrow

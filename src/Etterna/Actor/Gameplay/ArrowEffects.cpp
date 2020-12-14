@@ -816,6 +816,36 @@ ArrowEffects::ReceptorGetRotationZ(const PlayerState* pPlayerState, int iCol)
 	return fRotation;
 }
 
+float
+ArrowEffects::GetMoveX(int iCol)
+{
+	const float* fMoves = curr_options->m_fMovesX;
+	float f = 0;
+	if (fMoves[iCol] != 0)
+		f += ARROW_SIZE * fMoves[iCol];
+	return f;
+}
+
+float
+ArrowEffects::GetMoveY(int iCol)
+{
+	const float* fMoves = curr_options->m_fMovesY;
+	float f = 0;
+	if (fMoves[iCol] != 0)
+		f += ARROW_SIZE * fMoves[iCol];
+	return f;
+}
+
+float
+ArrowEffects::GetMoveZ(int iCol)
+{
+	const float* fMoves = curr_options->m_fMovesZ;
+	float f = 0;
+	if (fMoves[iCol] != 0)
+		f += ARROW_SIZE * fMoves[iCol];
+	return f;
+}
+
 constexpr auto CENTER_LINE_Y = 160; // from fYOffset == 0;
 constexpr auto FADE_DIST_Y = 40;
 

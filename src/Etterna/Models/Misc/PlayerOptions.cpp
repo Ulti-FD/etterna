@@ -101,6 +101,12 @@ PlayerOptions::Init()
 	m_bStealthType = false;
 	m_bStealthPastReceptors = false;
 	m_bCosecant = false;
+	ZERO(m_fMovesX);
+	ONE(m_SpeedfMovesX);
+	ZERO(m_fMovesY);
+	ONE(m_SpeedfMovesY);
+	ZERO(m_fMovesZ);
+	ONE(m_SpeedfMovesZ);
 	ZERO(m_fConfusionZ);
 	ONE(m_SpeedfConfusionZ);
 	ZERO(m_fConfusionY);
@@ -155,6 +161,12 @@ PlayerOptions::Approach(const PlayerOptions& other, float fDeltaSeconds)
 	DO_COPY(m_MinTNSToHideNotes);
 	DO_COPY(m_sNoteSkin);
 	DO_COPY(m_bCosecant);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fMovesX[i]);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fMovesY[i]);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fMovesZ[i]);
 	for (int i = 0; i < 16; i++)
 		APPROACH(fConfusionX[i]);
 	for (int i = 0; i < 16; i++)
@@ -307,7 +319,13 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_bStealthPastReceptors, "StealthPastReceptors");
 
 	for (int i = 0; i < 16; i++) {
-		auto s = ssprintf("Stealth%d", i + 1);
+		auto s = ssprintf("MoveX%d", i + 1);
+		AddPart(AddTo, m_fMovesX[i], s);
+		s = ssprintf("MoveY%d", i + 1);
+		AddPart(AddTo, m_fMovesY[i], s);
+		s = ssprintf("MoveZ%d", i + 1);
+		AddPart(AddTo, m_fMovesZ[i], s);
+		s = ssprintf("Stealth%d", i + 1);
 		AddPart(AddTo, m_fStealth[i], s);
 		s = ssprintf("ConfusionXOffset%d", i + 1);
 		AddPart(AddTo, m_fConfusionX[i], s);
@@ -856,8 +874,7 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 		SET_FLOAT(fSkew)
 	else if (sBit == "tilt")
 		SET_FLOAT(fPerspectiveTilt)
-	else if (sBit == "noteskin" && !on) /* "no noteskin" */
-	{
+	else if (sBit == "noteskin" && !on) /* "no noteskin" */ {
 		m_sNoteSkin = CommonMetrics::DEFAULT_NOTESKIN_NAME;
 	} else if (sBit == "randomspeed")
 		SET_FLOAT(fRandomSpeed)
@@ -878,7 +895,34 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 		ChooseRandomModifiers();
 	else if (sBit == "practicemode")
 		m_bPractice = on;
-	else if (sBit == "cosecant")
+
+	else if (sBit.find("move") != sBit.npos) {
+		if (sBit.find("x") != sBit.npos) {
+			for (int i = 0; i < 16; i++) {
+				sMod = ssprintf("movex%d", i + 1);
+				if (sBit == sMod) {
+					SET_FLOAT(fMovesX[i])
+					break;
+				}
+			}
+		} else if (sBit.find("y") != sBit.npos) {
+			for (int i = 0; i < 16; i++) {
+				sMod = ssprintf("movey%d", i + 1);
+				if (sBit == sMod) {
+					SET_FLOAT(fMovesY[i])
+					break;
+				}
+			}
+		} else if (sBit.find("z") != sBit.npos) {
+			for (int i = 0; i < 16; i++) {
+				sMod = ssprintf("movez%d", i + 1);
+				if (sBit == sMod) {
+					SET_FLOAT(fMovesZ[i])
+					break;
+				}
+			}
+		}
+	} else if (sBit == "cosecant")
 		m_bCosecant = on;
 	// deprecated mods/left in for compatibility
 	else if (sBit == "converge")
@@ -1159,13 +1203,19 @@ PlayerOptions::operator==(const PlayerOptions& other) const
 	for (auto i = 0; i < PlayerOptions::NUM_TRANSFORMS; ++i)
 		COMPARE(m_bTransforms[i]);
 	for (int i = 0; i < 16; ++i)
-		COMPARE(m_fStealth[i]);
+		COMPARE(m_fMovesX[i]);
+	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fMovesY[i]);
+	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fMovesZ[i]);
 	for (int i = 0; i < 16; ++i)
 		COMPARE(m_fConfusionX[i]);
 	for (int i = 0; i < 16; ++i)
 		COMPARE(m_fConfusionY[i]);
 	for (int i = 0; i < 16; ++i)
 		COMPARE(m_fConfusionZ[i]);
+	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fStealth[i]);
 #undef COMPARE
 	return true;
 }
@@ -1222,6 +1272,15 @@ PlayerOptions::operator=(PlayerOptions const& other)
 	}
 	for (auto i = 0; i < PlayerOptions::NUM_TRANSFORMS; ++i) {
 		CPY(m_bTransforms[i]);
+	}
+	for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fMovesX[i]);
+	}
+	for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fMovesY[i]);
+	}
+	for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fMovesZ[i]);
 	}
 	for (int i = 0; i < 16; ++i) {
 		CPY_SPEED(fConfusionX[i]);
@@ -1629,6 +1688,9 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	BOOL_INTERFACE(StealthType, StealthType);
 	BOOL_INTERFACE(StealthPastReceptors, StealthPastReceptors);
 
+	MULTICOL_FLOAT_INTERFACE(MoveX, MovesX, true);
+	MULTICOL_FLOAT_INTERFACE(MoveY, MovesY, true);
+	MULTICOL_FLOAT_INTERFACE(MoveZ, MovesZ, true);
 	MULTICOL_FLOAT_INTERFACE(ConfusionXOffset, ConfusionX, true);
 	MULTICOL_FLOAT_INTERFACE(ConfusionYOffset, ConfusionY, true);
 	MULTICOL_FLOAT_INTERFACE(ConfusionOffset, ConfusionZ, true);
@@ -2072,12 +2134,15 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Passmark);
 		ADD_METHOD(RandomSpeed);
 
-		ADD_MULTICOL_METHOD(Stealth);		  // functional, verified!
+		ADD_MULTICOL_METHOD(MoveX);
+		ADD_MULTICOL_METHOD(MoveY);
+		ADD_MULTICOL_METHOD(MoveZ);
 		ADD_MULTICOL_METHOD(ConfusionOffset); // functional, verified!
 		ADD_MULTICOL_METHOD(
 		  ConfusionXOffset); // functional and verified
 							 // but doesn't auto reset to 0? investigate
 		ADD_MULTICOL_METHOD(ConfusionYOffset); // functional, verified!
+		ADD_MULTICOL_METHOD(Stealth);		   // functional, verified!
 
 		ADD_METHOD(NoteSkin);
 		ADD_METHOD(MuteOnError);

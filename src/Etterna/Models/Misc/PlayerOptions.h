@@ -68,14 +68,20 @@ class PlayerOptions
 		ONE(m_SpeedfScrolls);
 		ZERO(m_bTurns);
 		ZERO(m_bTransforms);
-		ZERO(m_fStealth);
-		ONE(m_SpeedfStealth);
+		ZERO(m_fMovesX);
+		ONE(m_SpeedfMovesX);
+		ZERO(m_fMovesY);
+		ONE(m_SpeedfMovesY);
+		ZERO(m_fMovesZ);
+		ONE(m_SpeedfMovesZ);
 		ZERO(m_fConfusionX);
 		ONE(m_SpeedfConfusionX);
 		ZERO(m_fConfusionY);
 		ONE(m_SpeedfConfusionY);
 		ZERO(m_fConfusionZ);
 		ONE(m_SpeedfConfusionZ);
+		ZERO(m_fStealth);
+		ONE(m_SpeedfStealth);
 	};
 	void Init();
 	void Approach(const PlayerOptions& other, float fDeltaSeconds);
@@ -291,6 +297,10 @@ class PlayerOptions
 	bool m_bMuteOnError{ false };
 	bool m_bPractice{ false };
 
+	/* The maximum column number is 16.*/
+	float m_fMovesX[16], m_SpeedfMovesX[16];
+	float m_fMovesY[16], m_SpeedfMovesY[16];
+	float m_fMovesZ[16], m_SpeedfMovesZ[16];
 	float m_fConfusionX[16], m_SpeedfConfusionX[16];
 	float m_fConfusionY[16], m_SpeedfConfusionY[16];
 	float m_fConfusionZ[16], m_SpeedfConfusionZ[16];
