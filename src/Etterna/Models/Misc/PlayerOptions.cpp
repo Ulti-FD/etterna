@@ -269,6 +269,9 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fEffects[EFFECT_XMODE], "XMode");
 	AddPart(AddTo, m_fEffects[EFFECT_TWIRL], "Twirl");
 	AddPart(AddTo, m_fEffects[EFFECT_ROLL], "Roll");
+	AddPart(AddTo, m_fEffects[EFFECT_ATTENUATE_X], "AttenuateX");
+	// AddPart( AddTo, m_fEffects[EFFECT_ATTENUATE_Y],		"AttenuateY" );
+	// AddPart( AddTo, m_fEffects[EFFECT_ATTENUATE_Z],		"AttenuateZ" );
 
 	AddPart(AddTo, m_fAppearances[APPEARANCE_HIDDEN], "Hidden");
 	AddPart(AddTo, m_fAppearances[APPEARANCE_HIDDEN_OFFSET], "HiddenOffset");
@@ -703,7 +706,16 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 				}
 			}
 		}
-	} else if (sBit == "blink")
+	} else if (sBit.find("attenuate") != sBit.npos) {
+		if (sBit == "attenuatex")
+			SET_FLOAT(fEffects[EFFECT_ATTENUATE_X])
+		// else if( sBit == "attenuatey" )
+		//	SET_FLOAT( fEffects[EFFECT_ATTENUATE_Y] )
+		// else if( sBit == "attenuatez" )
+		//	SET_FLOAT( fEffects[EFFECT_ATTENUATE_Z] )
+	}
+
+	else if (sBit == "blink")
 		SET_FLOAT(fAppearances[APPEARANCE_BLINK])
 	else if (sBit == "randomvanish")
 		SET_FLOAT(fAppearances[APPEARANCE_RANDOMVANISH])
@@ -1524,6 +1536,12 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(Xmode, Effects[PlayerOptions::EFFECT_XMODE], true);
 	FLOAT_INTERFACE(Twirl, Effects[PlayerOptions::EFFECT_TWIRL], true);
 	FLOAT_INTERFACE(Roll, Effects[PlayerOptions::EFFECT_ROLL], true);
+	FLOAT_INTERFACE(AttenuateX,
+					Effects[PlayerOptions::EFFECT_ATTENUATE_X],
+					true);
+	// FLOAT_INTERFACE(AttenuateY, Effects[PlayerOptions::EFFECT_ATTENUATE_Y],
+	// true); FLOAT_INTERFACE(AttenuateZ,
+	// Effects[PlayerOptions::EFFECT_ATTENUATE_Z], true);
 
 	FLOAT_INTERFACE(Hidden,
 					Appearances[PlayerOptions::APPEARANCE_HIDDEN],
@@ -1930,6 +1948,9 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Xmode); // depends on player2, so broken, fix later mb
 		ADD_METHOD(Twirl);
 		ADD_METHOD(Roll);
+		ADD_METHOD(AttenuateX);
+		// ADD_METHOD(AttenuateY);
+		// ADD_METHOD(AttenuateZ);
 
 		ADD_METHOD(Hidden);
 		ADD_METHOD(HiddenOffset);

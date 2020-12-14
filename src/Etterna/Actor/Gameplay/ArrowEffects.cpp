@@ -663,6 +663,14 @@ ArrowEffects::GetXPos(const PlayerState* pPlayerState,
 		fPixelOffsetFromCenter *= fTinyPercent;
 	}
 
+	if (fEffects[PlayerOptions::EFFECT_ATTENUATE_X] != 0) {
+		const float fXOffset = pCols[iColNum].fXOffset;
+		fPixelOffsetFromCenter += fEffects[PlayerOptions::EFFECT_ATTENUATE_X] *
+								  (fYOffset / ARROW_SIZE) *
+								  (fYOffset / ARROW_SIZE) *
+								  (fXOffset / ARROW_SIZE);
+	}
+
 	return fPixelOffsetFromCenter;
 }
 
