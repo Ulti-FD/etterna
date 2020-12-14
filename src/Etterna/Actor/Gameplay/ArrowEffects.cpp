@@ -681,7 +681,14 @@ ArrowEffects::GetXPos(const PlayerState* pPlayerState,
 								  (fYOffset / ARROW_SIZE) *
 								  (fXOffset / ARROW_SIZE);
 	}
-
+	if (fEffects[PlayerOptions::EFFECT_BOUNCE] != 0) {
+		float fBounceAmt = fabsf(RageFastSin(
+		  ((fYOffset +
+			(1.0f * (fEffects[PlayerOptions::EFFECT_BOUNCE_OFFSET]))) /
+		   (60 + (fEffects[PlayerOptions::EFFECT_BOUNCE_PERIOD] * 60)))));
+		fPixelOffsetFromCenter += fEffects[PlayerOptions::EFFECT_BOUNCE] *
+								  ARROW_SIZE * 0.5f * fBounceAmt;
+	}
 	return fPixelOffsetFromCenter;
 }
 
@@ -1029,7 +1036,14 @@ ArrowEffects::GetZPos(const PlayerState* pPlayerState, int iCol, float fYOffset)
 				 (fYOffset / ARROW_SIZE) * (fYOffset / ARROW_SIZE) *
 				 (fXOffset / ARROW_SIZE);
 	}
-
+	if (fEffects[PlayerOptions::EFFECT_BOUNCE_Z] != 0) {
+		float fBounceAmt = fabsf(RageFastSin(
+		  ((fYOffset +
+			(1.0f * (fEffects[PlayerOptions::EFFECT_BOUNCE_Z_OFFSET]))) /
+		   (60 + (fEffects[PlayerOptions::EFFECT_BOUNCE_Z_PERIOD] * 60)))));
+		fZPos += fEffects[PlayerOptions::EFFECT_BOUNCE_Z] * ARROW_SIZE * 0.5f *
+				 fBounceAmt;
+	}
 	return fZPos;
 }
 

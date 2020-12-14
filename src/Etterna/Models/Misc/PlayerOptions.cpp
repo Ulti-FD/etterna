@@ -272,6 +272,12 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fEffects[EFFECT_ATTENUATE_X], "AttenuateX");
 	AddPart(AddTo, m_fEffects[EFFECT_ATTENUATE_Y], "AttenuateY");
 	AddPart(AddTo, m_fEffects[EFFECT_ATTENUATE_Z], "AttenuateZ");
+	AddPart(AddTo, m_fEffects[EFFECT_BOUNCE], "Bounce");
+	AddPart(AddTo, m_fEffects[EFFECT_BOUNCE_PERIOD], "BouncePeriod");
+	AddPart(AddTo, m_fEffects[EFFECT_BOUNCE_OFFSET], "BounceOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_BOUNCE_Z], "BounceZ");
+	AddPart(AddTo, m_fEffects[EFFECT_BOUNCE_Z_PERIOD], "BounceZPeriod");
+	AddPart(AddTo, m_fEffects[EFFECT_BOUNCE_Z_OFFSET], "BounceZOffset");
 
 	AddPart(AddTo, m_fAppearances[APPEARANCE_HIDDEN], "Hidden");
 	AddPart(AddTo, m_fAppearances[APPEARANCE_HIDDEN_OFFSET], "HiddenOffset");
@@ -713,6 +719,19 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 			SET_FLOAT(fEffects[EFFECT_ATTENUATE_Y])
 		else if (sBit == "attenuatez")
 			SET_FLOAT(fEffects[EFFECT_ATTENUATE_Z])
+	} else if (sBit.find("bounce") != sBit.npos) {
+		if (sBit == "bounce")
+			SET_FLOAT(fEffects[EFFECT_BOUNCE])
+		else if (sBit == "bounceperiod")
+			SET_FLOAT(fEffects[EFFECT_BOUNCE_PERIOD])
+		else if (sBit == "bounceoffset")
+			SET_FLOAT(fEffects[EFFECT_BOUNCE_OFFSET])
+		else if (sBit == "bouncez")
+			SET_FLOAT(fEffects[EFFECT_BOUNCE_Z])
+		else if (sBit == "bouncezperiod")
+			SET_FLOAT(fEffects[EFFECT_BOUNCE_Z_PERIOD])
+		else if (sBit == "bouncezoffset")
+			SET_FLOAT(fEffects[EFFECT_BOUNCE_Z_OFFSET])
 	}
 
 	else if (sBit == "blink")
@@ -1545,6 +1564,20 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(AttenuateZ,
 					Effects[PlayerOptions::EFFECT_ATTENUATE_Z],
 					true);
+	FLOAT_INTERFACE(Bounce, Effects[PlayerOptions::EFFECT_BOUNCE], true);
+	FLOAT_INTERFACE(BouncePeriod,
+					Effects[PlayerOptions::EFFECT_BOUNCE_PERIOD],
+					true);
+	FLOAT_INTERFACE(BounceOffset,
+					Effects[PlayerOptions::EFFECT_BOUNCE_OFFSET],
+					true);
+	FLOAT_INTERFACE(BounceZ, Effects[PlayerOptions::EFFECT_BOUNCE_Z], true);
+	FLOAT_INTERFACE(BounceZPeriod,
+					Effects[PlayerOptions::EFFECT_BOUNCE_Z_PERIOD],
+					true);
+	FLOAT_INTERFACE(BounceZOffset,
+					Effects[PlayerOptions::EFFECT_BOUNCE_Z_OFFSET],
+					true);
 
 	FLOAT_INTERFACE(Hidden,
 					Appearances[PlayerOptions::APPEARANCE_HIDDEN],
@@ -1922,6 +1955,8 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(ScrollSpeed);
 		ADD_METHOD(ScrollBPM);
 
+		// verification == need to crosscheck behavior vs sm5.1 and/or nITG
+
 		ADD_METHOD(Boost);
 		ADD_METHOD(Brake);
 		ADD_METHOD(Wave);
@@ -1951,9 +1986,15 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Xmode); // depends on player2, so broken, fix later mb
 		ADD_METHOD(Twirl);
 		ADD_METHOD(Roll);
-		ADD_METHOD(AttenuateX); // functional, verified!
-		ADD_METHOD(AttenuateY); // functional, verified!
-		ADD_METHOD(AttenuateZ); // functional, verified!
+		ADD_METHOD(AttenuateX);	   // functional, verified!
+		ADD_METHOD(AttenuateY);	   // functional, verified!
+		ADD_METHOD(AttenuateZ);	   // functional, verified!
+		ADD_METHOD(Bounce);		   // functional but needs verification
+		ADD_METHOD(BouncePeriod);  // functional but needs verification
+		ADD_METHOD(BounceOffset);  // functional but needs verification
+		ADD_METHOD(BounceZ);	   // functional but needs verification
+		ADD_METHOD(BounceZPeriod); // functional but needs verification
+		ADD_METHOD(BounceZOffset); // functional but needs verification
 
 		ADD_METHOD(Hidden);
 		ADD_METHOD(HiddenOffset);
