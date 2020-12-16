@@ -129,6 +129,13 @@ SelectTanType(float angle, bool is_cosec)
 		return RageFastTan(angle);
 }
 
+static float
+CalculateDigitalAngle(float y_offset, float offset, float period)
+{
+	return PI * (y_offset + (1.0f * offset)) /
+		   (ARROW_SIZE + (period * ARROW_SIZE));
+}
+
 namespace {
 struct PerPlayerData
 {
@@ -689,6 +696,27 @@ ArrowEffects::GetXPos(const PlayerState* pPlayerState,
 		fPixelOffsetFromCenter += fEffects[PlayerOptions::EFFECT_BOUNCE] *
 								  ARROW_SIZE * 0.5f * fBounceAmt;
 	}
+	if (fEffects[PlayerOptions::EFFECT_DIGITAL] != 0)
+		fPixelOffsetFromCenter +=
+		  (fEffects[PlayerOptions::EFFECT_DIGITAL] * ARROW_SIZE * 0.5f) *
+		  round((fEffects[PlayerOptions::EFFECT_DIGITAL_STEPS] + 1) *
+				RageFastSin(CalculateDigitalAngle(
+				  fYOffset,
+				  fEffects[PlayerOptions::EFFECT_DIGITAL_OFFSET],
+				  fEffects[PlayerOptions::EFFECT_DIGITAL_PERIOD]))) /
+		  (fEffects[PlayerOptions::EFFECT_DIGITAL_STEPS] + 1);
+	if (fEffects[PlayerOptions::EFFECT_TAN_DIGITAL] != 0)
+		fPixelOffsetFromCenter +=
+		  (fEffects[PlayerOptions::EFFECT_TAN_DIGITAL] * ARROW_SIZE * 0.5f) *
+		  round(
+			(fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_STEPS] + 1) *
+			SelectTanType(CalculateDigitalAngle(
+							fYOffset,
+							fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_OFFSET],
+							fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_PERIOD]),
+						  curr_options->m_bCosecant)) /
+		  (fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_STEPS] + 1);
+
 	return fPixelOffsetFromCenter;
 }
 
@@ -1078,6 +1106,28 @@ ArrowEffects::GetZPos(const PlayerState* pPlayerState, int iCol, float fYOffset)
 		fZPos += fEffects[PlayerOptions::EFFECT_BOUNCE_Z] * ARROW_SIZE * 0.5f *
 				 fBounceAmt;
 	}
+	if (fEffects[PlayerOptions::EFFECT_DIGITAL_Z] != 0)
+		fZPos +=
+		  (fEffects[PlayerOptions::EFFECT_DIGITAL_Z] * ARROW_SIZE * 0.5f) *
+		  round((fEffects[PlayerOptions::EFFECT_DIGITAL_Z_STEPS] + 1) *
+				RageFastSin(CalculateDigitalAngle(
+				  fYOffset,
+				  fEffects[PlayerOptions::EFFECT_DIGITAL_Z_OFFSET],
+				  fEffects[PlayerOptions::EFFECT_DIGITAL_Z_PERIOD]))) /
+		  (fEffects[PlayerOptions::EFFECT_DIGITAL_Z_STEPS] + 1);
+
+	if (fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_Z] != 0)
+		fZPos +=
+		  (fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_Z] * ARROW_SIZE * 0.5f) *
+		  round((fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_STEPS] + 1) *
+				SelectTanType(
+				  CalculateDigitalAngle(
+					fYOffset,
+					fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_OFFSET],
+					fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_PERIOD]),
+				  curr_options->m_bCosecant)) /
+		  (fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_STEPS] + 1);
+
 	return fZPos;
 }
 
@@ -1092,6 +1142,9 @@ ArrowEffects::NeedZBuffer()
 		return true;
 	if (fEffects[PlayerOptions::EFFECT_ATTENUATE_Z] != 0)
 		return true;
+	if (fEffects[PlayerOptions::EFFECT_DIGITAL_Z] != 0)
+		return true;
+
 	return false;
 }
 

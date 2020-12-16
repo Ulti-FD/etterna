@@ -302,6 +302,24 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fEffects[EFFECT_BOUNCE_Z], "BounceZ");
 	AddPart(AddTo, m_fEffects[EFFECT_BOUNCE_Z_PERIOD], "BounceZPeriod");
 	AddPart(AddTo, m_fEffects[EFFECT_BOUNCE_Z_OFFSET], "BounceZOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_DIGITAL], "Digital");
+	AddPart(AddTo, m_fEffects[EFFECT_DIGITAL_STEPS], "DigitalSteps");
+	AddPart(AddTo, m_fEffects[EFFECT_DIGITAL_PERIOD], "DigitalPeriod");
+	AddPart(AddTo, m_fEffects[EFFECT_DIGITAL_OFFSET], "DigitalOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_TAN_DIGITAL], "TanDigital");
+	AddPart(AddTo, m_fEffects[EFFECT_TAN_DIGITAL_STEPS], "TanDigitalSteps");
+	AddPart(AddTo, m_fEffects[EFFECT_TAN_DIGITAL_PERIOD], "TanDigitalPeriod");
+	AddPart(AddTo, m_fEffects[EFFECT_TAN_DIGITAL_OFFSET], "TanDigitalOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_DIGITAL_Z], "DigitalZ");
+	AddPart(AddTo, m_fEffects[EFFECT_DIGITAL_Z_STEPS], "DigitalZSteps");
+	AddPart(AddTo, m_fEffects[EFFECT_DIGITAL_Z_PERIOD], "DigitalZPeriod");
+	AddPart(AddTo, m_fEffects[EFFECT_DIGITAL_Z_OFFSET], "DigitalZOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_TAN_DIGITAL_Z], "TanDigitalZ");
+	AddPart(AddTo, m_fEffects[EFFECT_TAN_DIGITAL_Z_STEPS], "TanDigitalZSteps");
+	AddPart(
+	  AddTo, m_fEffects[EFFECT_TAN_DIGITAL_Z_PERIOD], "TanDigitalZPeriod");
+	AddPart(
+	  AddTo, m_fEffects[EFFECT_TAN_DIGITAL_Z_OFFSET], "TanDigitalZOffset");
 
 	AddPart(AddTo, m_fAppearances[APPEARANCE_HIDDEN], "Hidden");
 	AddPart(AddTo, m_fAppearances[APPEARANCE_HIDDEN_OFFSET], "HiddenOffset");
@@ -788,6 +806,39 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 			SET_FLOAT(fEffects[EFFECT_BOUNCE_Z_PERIOD])
 		else if (sBit == "bouncezoffset")
 			SET_FLOAT(fEffects[EFFECT_BOUNCE_Z_OFFSET])
+	} else if (sBit.find("digital") != sBit.npos) {
+		if (sBit == "digital")
+			SET_FLOAT(fEffects[EFFECT_DIGITAL])
+		else if (sBit == "digitalsteps")
+			SET_FLOAT(fEffects[EFFECT_DIGITAL_STEPS])
+		else if (sBit == "digitalperiod")
+			SET_FLOAT(fEffects[EFFECT_DIGITAL_PERIOD])
+		else if (sBit == "digitaloffset")
+			SET_FLOAT(fEffects[EFFECT_DIGITAL_OFFSET])
+		else if (sBit == "tandigital")
+			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL])
+		else if (sBit == "tandigitalsteps")
+			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_STEPS])
+		else if (sBit == "tandigitalperiod")
+			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_PERIOD])
+		else if (sBit == "tandigitaloffset")
+			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_OFFSET])
+		else if (sBit == "digitalz")
+			SET_FLOAT(fEffects[EFFECT_DIGITAL_Z])
+		else if (sBit == "digitalzsteps")
+			SET_FLOAT(fEffects[EFFECT_DIGITAL_Z_STEPS])
+		else if (sBit == "digitalzperiod")
+			SET_FLOAT(fEffects[EFFECT_DIGITAL_Z_PERIOD])
+		else if (sBit == "digitalzoffset")
+			SET_FLOAT(fEffects[EFFECT_DIGITAL_Z_OFFSET])
+		else if (sBit == "tandigitalz")
+			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_Z])
+		else if (sBit == "tandigitalzsteps")
+			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_Z_STEPS])
+		else if (sBit == "tandigitalzperiod")
+			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_Z_PERIOD])
+		else if (sBit == "tandigitalzoffset")
+			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_Z_OFFSET])
 	}
 
 	else if (sBit == "blink")
@@ -1700,6 +1751,50 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(BounceZOffset,
 					Effects[PlayerOptions::EFFECT_BOUNCE_Z_OFFSET],
 					true);
+	FLOAT_INTERFACE(Digital, Effects[PlayerOptions::EFFECT_DIGITAL], true);
+	FLOAT_INTERFACE(DigitalSteps,
+					Effects[PlayerOptions::EFFECT_DIGITAL_STEPS],
+					true);
+	FLOAT_INTERFACE(DigitalPeriod,
+					Effects[PlayerOptions::EFFECT_DIGITAL_PERIOD],
+					true);
+	FLOAT_INTERFACE(DigitalOffset,
+					Effects[PlayerOptions::EFFECT_DIGITAL_OFFSET],
+					true);
+	FLOAT_INTERFACE(TanDigital,
+					Effects[PlayerOptions::EFFECT_TAN_DIGITAL],
+					true);
+	FLOAT_INTERFACE(TanDigitalSteps,
+					Effects[PlayerOptions::EFFECT_TAN_DIGITAL_STEPS],
+					true);
+	FLOAT_INTERFACE(TanDigitalPeriod,
+					Effects[PlayerOptions::EFFECT_TAN_DIGITAL_PERIOD],
+					true);
+	FLOAT_INTERFACE(TanDigitalOffset,
+					Effects[PlayerOptions::EFFECT_TAN_DIGITAL_OFFSET],
+					true);
+	FLOAT_INTERFACE(DigitalZ, Effects[PlayerOptions::EFFECT_DIGITAL_Z], true);
+	FLOAT_INTERFACE(DigitalZSteps,
+					Effects[PlayerOptions::EFFECT_DIGITAL_Z_STEPS],
+					true);
+	FLOAT_INTERFACE(DigitalZPeriod,
+					Effects[PlayerOptions::EFFECT_DIGITAL_Z_PERIOD],
+					true);
+	FLOAT_INTERFACE(DigitalZOffset,
+					Effects[PlayerOptions::EFFECT_DIGITAL_Z_OFFSET],
+					true);
+	FLOAT_INTERFACE(TanDigitalZ,
+					Effects[PlayerOptions::EFFECT_TAN_DIGITAL_Z],
+					true);
+	FLOAT_INTERFACE(TanDigitalZSteps,
+					Effects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_STEPS],
+					true);
+	FLOAT_INTERFACE(TanDigitalZPeriod,
+					Effects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_PERIOD],
+					true);
+	FLOAT_INTERFACE(TanDigitalZOffset,
+					Effects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_OFFSET],
+					true);
 
 	FLOAT_INTERFACE(Hidden,
 					Appearances[PlayerOptions::APPEARANCE_HIDDEN],
@@ -2114,15 +2209,31 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Xmode); // depends on player2, so broken, fix later mb
 		ADD_METHOD(Twirl);
 		ADD_METHOD(Roll);
-		ADD_METHOD(AttenuateX);	   // functional, verified!
-		ADD_METHOD(AttenuateY);	   // functional, verified!
-		ADD_METHOD(AttenuateZ);	   // functional, verified!
-		ADD_METHOD(Bounce);		   // functional but needs verification
-		ADD_METHOD(BouncePeriod);  // functional but needs verification
-		ADD_METHOD(BounceOffset);  // functional but needs verification
-		ADD_METHOD(BounceZ);	   // functional but needs verification
-		ADD_METHOD(BounceZPeriod); // functional but needs verification
-		ADD_METHOD(BounceZOffset); // functional but needs verification
+		ADD_METHOD(AttenuateX);		   // functional, verified!
+		ADD_METHOD(AttenuateY);		   // functional, verified!
+		ADD_METHOD(AttenuateZ);		   // functional, verified!
+		ADD_METHOD(Bounce);			   // functional but needs verification
+		ADD_METHOD(BouncePeriod);	   // functional but needs verification
+		ADD_METHOD(BounceOffset);	   // functional but needs verification
+		ADD_METHOD(BounceZ);		   // functional but needs verification
+		ADD_METHOD(BounceZPeriod);	   // functional but needs verification
+		ADD_METHOD(BounceZOffset);	   // functional but needs verification
+		ADD_METHOD(Digital);		   // functional but needs verification
+		ADD_METHOD(DigitalSteps);	   // functional but needs verification
+		ADD_METHOD(DigitalPeriod);	   // functional but needs verification
+		ADD_METHOD(DigitalOffset);	   // functional but needs verification
+		ADD_METHOD(TanDigital);		   // functional but needs verification
+		ADD_METHOD(TanDigitalSteps);   // functional but needs verification
+		ADD_METHOD(TanDigitalPeriod);  // functional but needs verification
+		ADD_METHOD(TanDigitalOffset);  // functional but needs verification
+		ADD_METHOD(DigitalZ);		   // functional but needs verification
+		ADD_METHOD(DigitalZSteps);	   // functional but needs verification
+		ADD_METHOD(DigitalZPeriod);	   // functional but needs verification
+		ADD_METHOD(DigitalZOffset);	   // functional but needs verification
+		ADD_METHOD(TanDigitalZ);	   // functional but needs verification
+		ADD_METHOD(TanDigitalZSteps);  // functional but needs verification
+		ADD_METHOD(TanDigitalZPeriod); // functional but needs verification
+		ADD_METHOD(TanDigitalZOffset); // functional but needs verification
 
 		ADD_METHOD(Hidden);
 		ADD_METHOD(HiddenOffset);
