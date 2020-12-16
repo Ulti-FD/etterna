@@ -320,6 +320,9 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	  AddTo, m_fEffects[EFFECT_TAN_DIGITAL_Z_PERIOD], "TanDigitalZPeriod");
 	AddPart(
 	  AddTo, m_fEffects[EFFECT_TAN_DIGITAL_Z_OFFSET], "TanDigitalZOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_PARABOLA_X], "ParabolaX");
+	AddPart(AddTo, m_fEffects[EFFECT_PARABOLA_Y], "ParabolaY");
+	AddPart(AddTo, m_fEffects[EFFECT_PARABOLA_Z], "ParabolaZ");
 	AddPart(AddTo, m_fEffects[EFFECT_SAWTOOTH], "Sawtooth");
 	AddPart(AddTo, m_fEffects[EFFECT_SAWTOOTH_PERIOD], "SawtoothPeriod");
 	AddPart(AddTo, m_fEffects[EFFECT_SAWTOOTH_Z], "SawtoothZ");
@@ -855,6 +858,13 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_Z_PERIOD])
 		else if (sBit == "tandigitalzoffset")
 			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_Z_OFFSET])
+	} else if (sBit.find("parabola") != sBit.npos) {
+		if (sBit == "parabolax")
+			SET_FLOAT(fEffects[EFFECT_PARABOLA_X])
+		else if (sBit == "parabolay")
+			SET_FLOAT(fEffects[EFFECT_PARABOLA_Y])
+		else if (sBit == "parabolaz")
+			SET_FLOAT(fEffects[EFFECT_PARABOLA_Z])
 	} else if (sBit.find("sawtooth") != sBit.npos) {
 		if (sBit == "sawtooth")
 			SET_FLOAT(fEffects[EFFECT_SAWTOOTH])
@@ -1846,6 +1856,9 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(TanDigitalZOffset,
 					Effects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_OFFSET],
 					true);
+	FLOAT_INTERFACE(ParabolaX, Effects[PlayerOptions::EFFECT_PARABOLA_X], true);
+	FLOAT_INTERFACE(ParabolaY, Effects[PlayerOptions::EFFECT_PARABOLA_Y], true);
+	FLOAT_INTERFACE(ParabolaZ, Effects[PlayerOptions::EFFECT_PARABOLA_Z], true);
 	FLOAT_INTERFACE(Sawtooth, Effects[PlayerOptions::EFFECT_SAWTOOTH], true);
 	FLOAT_INTERFACE(SawtoothPeriod,
 					Effects[PlayerOptions::EFFECT_SAWTOOTH_PERIOD],
@@ -2322,6 +2335,9 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(TanDigitalZPeriod); // functional but needs verification
 		ADD_METHOD(TanDigitalZOffset); // functional but needs verification
 		ADD_METHOD(Sawtooth);		   // functional but needs verification
+		ADD_METHOD(ParabolaX);		   // functional but needs verification
+		ADD_METHOD(ParabolaY);		   // functional but needs verification
+		ADD_METHOD(ParabolaZ);		   // functional but needs verification
 		ADD_METHOD(SawtoothPeriod);	   // functional but needs verification
 		ADD_METHOD(SawtoothZ);		   // functional but needs verification
 		ADD_METHOD(SawtoothZPeriod);   // functional but needs verification

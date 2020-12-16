@@ -405,6 +405,7 @@ ArrowEffects::GetYOffset(const PlayerState* pPlayerState,
 	}
 
 	const auto* const fAccels = curr_options->m_fAccels;
+	const auto* const fEffects = curr_options->m_fEffects;
 
 	float fYAdjust = 0; // fill this in depending on PlayerOptions
 
@@ -436,6 +437,10 @@ ArrowEffects::GetYOffset(const PlayerState* pPlayerState,
 		  RageFastSin(fYOffset / ((fAccels[PlayerOptions::ACCEL_WAVE_PERIOD] *
 								   WAVE_MOD_HEIGHT) +
 								  WAVE_MOD_HEIGHT));
+
+	if (fEffects[PlayerOptions::EFFECT_PARABOLA_Y] != 0)
+		fYAdjust += fEffects[PlayerOptions::EFFECT_PARABOLA_Y] *
+					(fYOffset / ARROW_SIZE) * (fYOffset / ARROW_SIZE);
 
 	fYOffset += fYAdjust;
 
@@ -590,6 +595,8 @@ ArrowEffects::GetYOffsetFromYPos(int iCol,
 	auto& data = g_EffectData;
 	f +=
 	  fEffects[PlayerOptions::EFFECT_TIPSY] * data.m_tipsy_offset_result[iCol];
+	f += fEffects[PlayerOptions::EFFECT_PARABOLA_Y] * (YPos / ARROW_SIZE) *
+		 (YPos / ARROW_SIZE);
 
 	float fShift, fScale;
 	ArrowGetReverseShiftAndScale(iCol, fYReverseOffsetPixels, fShift, fScale);
@@ -716,6 +723,10 @@ ArrowEffects::GetXPos(const PlayerState* pPlayerState,
 							fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_PERIOD]),
 						  curr_options->m_bCosecant)) /
 		  (fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_STEPS] + 1);
+	if (fEffects[PlayerOptions::EFFECT_PARABOLA_X] != 0)
+		fPixelOffsetFromCenter += fEffects[PlayerOptions::EFFECT_PARABOLA_X] *
+								  (fYOffset / ARROW_SIZE) *
+								  (fYOffset / ARROW_SIZE);
 	if (fEffects[PlayerOptions::EFFECT_SAWTOOTH] != 0)
 		fPixelOffsetFromCenter +=
 		  (fEffects[PlayerOptions::EFFECT_SAWTOOTH] * ARROW_SIZE) *
@@ -1156,6 +1167,9 @@ ArrowEffects::GetZPos(const PlayerState* pPlayerState, int iCol, float fYOffset)
 					fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_PERIOD]),
 				  curr_options->m_bCosecant)) /
 		  (fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_STEPS] + 1);
+	if (fEffects[PlayerOptions::EFFECT_PARABOLA_Z] != 0)
+		fZPos += fEffects[PlayerOptions::EFFECT_PARABOLA_Z] *
+				 (fYOffset / ARROW_SIZE) * (fYOffset / ARROW_SIZE);
 	if (fEffects[PlayerOptions::EFFECT_SAWTOOTH_Z] != 0)
 		fZPos +=
 		  (fEffects[PlayerOptions::EFFECT_SAWTOOTH_Z] * ARROW_SIZE) *
@@ -1207,7 +1221,8 @@ ArrowEffects::NeedZBuffer()
 		return true;
 	if (fEffects[PlayerOptions::EFFECT_SAWTOOTH_Z] != 0)
 		return true;
-
+	if (fEffects[PlayerOptions::EFFECT_PARABOLA_Z] != 0)
+		return true;
 	return false;
 }
 
