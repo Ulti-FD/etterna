@@ -846,19 +846,26 @@ RageFastCos(float x)
 {
 	return RageFastSin(x + 0.5f * PI);
 }
-
 float
 RageFastTan(float x)
 {
 	return RageFastSin(x) / RageFastCos(x);
 }
-
 float
 RageFastCsc(float x)
 {
 	return 1 / RageFastSin(x);
 }
 
+float
+RageSquare(float angle)
+{
+	float fAngle = fmod(angle, PI * 2);
+	// Hack: This ensures the hold notes don't flicker right before they're hit.
+	if (fAngle < 0.01f)
+		fAngle += PI * 2;
+	return fAngle >= PI ? -1.0 : 1.0;
+}
 float
 RageTriangle(float angle)
 {

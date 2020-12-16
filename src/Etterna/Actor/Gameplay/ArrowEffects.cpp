@@ -725,6 +725,17 @@ ArrowEffects::GetXPos(const PlayerState* pPlayerState,
 		   floor((0.5f / (fEffects[PlayerOptions::EFFECT_SAWTOOTH_PERIOD] + 1) *
 				  fYOffset) /
 				 ARROW_SIZE));
+	if (fEffects[PlayerOptions::EFFECT_SQUARE] != 0) {
+		float fResult = RageSquare(
+		  (PI *
+		   (fYOffset +
+			(1.0f * (fEffects[PlayerOptions::EFFECT_SQUARE_OFFSET]))) /
+		   (ARROW_SIZE +
+			(fEffects[PlayerOptions::EFFECT_SQUARE_PERIOD] * ARROW_SIZE))));
+		fPixelOffsetFromCenter +=
+		  (fEffects[PlayerOptions::EFFECT_SQUARE] * ARROW_SIZE * 0.5f) *
+		  fResult;
+	}
 	if (fEffects[PlayerOptions::EFFECT_ZIGZAG] != 0) {
 		float fResult = RageTriangle(
 		  (PI * (1 / (fEffects[PlayerOptions::EFFECT_ZIGZAG_PERIOD] + 1)) *
@@ -1155,6 +1166,17 @@ ArrowEffects::GetZPos(const PlayerState* pPlayerState, int iCol, float fYOffset)
 			 (0.5f / (fEffects[PlayerOptions::EFFECT_SAWTOOTH_Z_PERIOD] + 1) *
 			  fYOffset) /
 			 ARROW_SIZE));
+	if (fEffects[PlayerOptions::EFFECT_SQUARE_Z] != 0) {
+		float fResult = RageSquare(
+		  (PI *
+		   (fYOffset +
+			(1.0f * (fEffects[PlayerOptions::EFFECT_SQUARE_Z_OFFSET]))) /
+		   (ARROW_SIZE +
+			(fEffects[PlayerOptions::EFFECT_SQUARE_Z_PERIOD] * ARROW_SIZE))));
+		fZPos +=
+		  (fEffects[PlayerOptions::EFFECT_SQUARE_Z] * ARROW_SIZE * 0.5f) *
+		  fResult;
+	}
 	if (fEffects[PlayerOptions::EFFECT_ZIGZAG_Z] != 0) {
 		float fResult = RageTriangle(
 		  (PI * (1 / (fEffects[PlayerOptions::EFFECT_ZIGZAG_Z_PERIOD] + 1)) *

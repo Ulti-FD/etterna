@@ -324,6 +324,12 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fEffects[EFFECT_SAWTOOTH_PERIOD], "SawtoothPeriod");
 	AddPart(AddTo, m_fEffects[EFFECT_SAWTOOTH_Z], "SawtoothZ");
 	AddPart(AddTo, m_fEffects[EFFECT_SAWTOOTH_Z_PERIOD], "SawtoothZPeriod");
+	AddPart(AddTo, m_fEffects[EFFECT_SQUARE], "Square");
+	AddPart(AddTo, m_fEffects[EFFECT_SQUARE_OFFSET], "SquareOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_SQUARE_PERIOD], "SquarePeriod");
+	AddPart(AddTo, m_fEffects[EFFECT_SQUARE_Z], "SquareZ");
+	AddPart(AddTo, m_fEffects[EFFECT_SQUARE_Z_OFFSET], "SquareZOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_SQUARE_Z_PERIOD], "SquareZPeriod");
 	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG], "Zigzag");
 	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG_PERIOD], "ZigzagPeriod");
 	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG_OFFSET], "ZigzagOffset");
@@ -858,6 +864,19 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 			SET_FLOAT(fEffects[EFFECT_SAWTOOTH_Z])
 		else if (sBit == "sawtoothzperiod")
 			SET_FLOAT(fEffects[EFFECT_SAWTOOTH_Z_PERIOD])
+	} else if (sBit.find("square") != sBit.npos) {
+		if (sBit == "square")
+			SET_FLOAT(fEffects[EFFECT_SQUARE])
+		else if (sBit == "squareoffset")
+			SET_FLOAT(fEffects[EFFECT_SQUARE_OFFSET])
+		else if (sBit == "squareperiod")
+			SET_FLOAT(fEffects[EFFECT_SQUARE_PERIOD])
+		else if (sBit == "squarez")
+			SET_FLOAT(fEffects[EFFECT_SQUARE_Z])
+		else if (sBit == "squarezoffset")
+			SET_FLOAT(fEffects[EFFECT_SQUARE_Z_OFFSET])
+		else if (sBit == "squarezperiod")
+			SET_FLOAT(fEffects[EFFECT_SQUARE_Z_PERIOD])
 	} else if (sBit.find("zigzag") != sBit.npos) {
 		if (sBit == "zigzag")
 			SET_FLOAT(fEffects[EFFECT_ZIGZAG])
@@ -1835,6 +1854,20 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(SawtoothZPeriod,
 					Effects[PlayerOptions::EFFECT_SAWTOOTH_Z_PERIOD],
 					true);
+	FLOAT_INTERFACE(Square, Effects[PlayerOptions::EFFECT_SQUARE], true);
+	FLOAT_INTERFACE(SquareOffset,
+					Effects[PlayerOptions::EFFECT_SQUARE_OFFSET],
+					true);
+	FLOAT_INTERFACE(SquarePeriod,
+					Effects[PlayerOptions::EFFECT_SQUARE_PERIOD],
+					true);
+	FLOAT_INTERFACE(SquareZ, Effects[PlayerOptions::EFFECT_SQUARE_Z], true);
+	FLOAT_INTERFACE(SquareZOffset,
+					Effects[PlayerOptions::EFFECT_SQUARE_Z_OFFSET],
+					true);
+	FLOAT_INTERFACE(SquareZPeriod,
+					Effects[PlayerOptions::EFFECT_SQUARE_Z_PERIOD],
+					true);
 	FLOAT_INTERFACE(Zigzag, Effects[PlayerOptions::EFFECT_ZIGZAG], true);
 	FLOAT_INTERFACE(ZigzagPeriod,
 					Effects[PlayerOptions::EFFECT_ZIGZAG_PERIOD],
@@ -2292,6 +2325,12 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(SawtoothPeriod);	   // functional but needs verification
 		ADD_METHOD(SawtoothZ);		   // functional but needs verification
 		ADD_METHOD(SawtoothZPeriod);   // functional but needs verification
+		ADD_METHOD(Square);			   // functional but needs verification
+		ADD_METHOD(SquareOffset);	   // functional but needs verification
+		ADD_METHOD(SquarePeriod);	   // functional but needs verification
+		ADD_METHOD(SquareZ);		   // functional but needs verification
+		ADD_METHOD(SquareZOffset);	   // functional but needs verification
+		ADD_METHOD(SquareZPeriod);	   // functional but needs verification
 		ADD_METHOD(Zigzag);			   // functional but needs verification
 		ADD_METHOD(ZigzagPeriod);	   // functional but needs verification
 		ADD_METHOD(ZigzagOffset);	   // functional but needs verification

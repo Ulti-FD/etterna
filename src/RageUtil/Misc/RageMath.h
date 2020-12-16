@@ -128,6 +128,9 @@ auto
 RageFastTan(float x) -> float CONST_FUNCTION;
 auto
 RageFastCsc(float x) -> float CONST_FUNCTION;
+
+auto
+RageSquare(float x) -> float CONST_FUNCTION;
 auto
 RageTriangle(float x) -> float CONST_FUNCTION;
 
