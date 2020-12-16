@@ -320,6 +320,10 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	  AddTo, m_fEffects[EFFECT_TAN_DIGITAL_Z_PERIOD], "TanDigitalZPeriod");
 	AddPart(
 	  AddTo, m_fEffects[EFFECT_TAN_DIGITAL_Z_OFFSET], "TanDigitalZOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_SAWTOOTH], "Sawtooth");
+	AddPart(AddTo, m_fEffects[EFFECT_SAWTOOTH_PERIOD], "SawtoothPeriod");
+	AddPart(AddTo, m_fEffects[EFFECT_SAWTOOTH_Z], "SawtoothZ");
+	AddPart(AddTo, m_fEffects[EFFECT_SAWTOOTH_Z_PERIOD], "SawtoothZPeriod");
 	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG], "Zigzag");
 	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG_PERIOD], "ZigzagPeriod");
 	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG_OFFSET], "ZigzagOffset");
@@ -845,6 +849,15 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_Z_PERIOD])
 		else if (sBit == "tandigitalzoffset")
 			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_Z_OFFSET])
+	} else if (sBit.find("sawtooth") != sBit.npos) {
+		if (sBit == "sawtooth")
+			SET_FLOAT(fEffects[EFFECT_SAWTOOTH])
+		else if (sBit == "sawtoothperiod")
+			SET_FLOAT(fEffects[EFFECT_SAWTOOTH_PERIOD])
+		else if (sBit == "sawtoothz")
+			SET_FLOAT(fEffects[EFFECT_SAWTOOTH_Z])
+		else if (sBit == "sawtoothzperiod")
+			SET_FLOAT(fEffects[EFFECT_SAWTOOTH_Z_PERIOD])
 	} else if (sBit.find("zigzag") != sBit.npos) {
 		if (sBit == "zigzag")
 			SET_FLOAT(fEffects[EFFECT_ZIGZAG])
@@ -1814,6 +1827,14 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(TanDigitalZOffset,
 					Effects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_OFFSET],
 					true);
+	FLOAT_INTERFACE(Sawtooth, Effects[PlayerOptions::EFFECT_SAWTOOTH], true);
+	FLOAT_INTERFACE(SawtoothPeriod,
+					Effects[PlayerOptions::EFFECT_SAWTOOTH_PERIOD],
+					true);
+	FLOAT_INTERFACE(SawtoothZ, Effects[PlayerOptions::EFFECT_SAWTOOTH_Z], true);
+	FLOAT_INTERFACE(SawtoothZPeriod,
+					Effects[PlayerOptions::EFFECT_SAWTOOTH_Z_PERIOD],
+					true);
 	FLOAT_INTERFACE(Zigzag, Effects[PlayerOptions::EFFECT_ZIGZAG], true);
 	FLOAT_INTERFACE(ZigzagPeriod,
 					Effects[PlayerOptions::EFFECT_ZIGZAG_PERIOD],
@@ -2267,6 +2288,10 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(TanDigitalZSteps);  // functional but needs verification
 		ADD_METHOD(TanDigitalZPeriod); // functional but needs verification
 		ADD_METHOD(TanDigitalZOffset); // functional but needs verification
+		ADD_METHOD(Sawtooth);		   // functional but needs verification
+		ADD_METHOD(SawtoothPeriod);	   // functional but needs verification
+		ADD_METHOD(SawtoothZ);		   // functional but needs verification
+		ADD_METHOD(SawtoothZPeriod);   // functional but needs verification
 		ADD_METHOD(Zigzag);			   // functional but needs verification
 		ADD_METHOD(ZigzagPeriod);	   // functional but needs verification
 		ADD_METHOD(ZigzagOffset);	   // functional but needs verification
