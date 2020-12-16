@@ -88,6 +88,8 @@ class PlayerOptions
 		ONE(m_SpeedfStealth);
 		ZERO(m_fReverse);
 		ONE(m_SpeedfReverse);
+		ZERO(m_fDarks);
+		ONE(m_SpeedfDarks);
 	};
 	void Init();
 	void Approach(const PlayerOptions& other, float fDeltaSeconds);
@@ -349,6 +351,7 @@ class PlayerOptions
 	float m_fConfusionZ[16], m_SpeedfConfusionZ[16];
 	float m_fStealth[16], m_SpeedfStealth[16];
 	float m_fReverse[16], m_SpeedfReverse[16];
+	float m_fDarks[16], m_SpeedfDarks[16];
 
 	bool m_bCosecant{ false };
 	bool m_bStealthType{ false };

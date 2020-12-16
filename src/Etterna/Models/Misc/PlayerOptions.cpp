@@ -121,6 +121,8 @@ PlayerOptions::Init()
 	ONE(m_SpeedfStealth);
 	ZERO(m_fReverse);
 	ONE(m_SpeedfReverse);
+	ZERO(m_fDarks);
+	ONE(m_SpeedfDarks);
 }
 
 void
@@ -187,6 +189,8 @@ PlayerOptions::Approach(const PlayerOptions& other, float fDeltaSeconds)
 		APPROACH(fStealth[i]);
 	for (int i = 0; i < 16; i++)
 		APPROACH(fReverse[i]);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fDarks[i]);
 	DO_COPY(m_bStealthType);
 	DO_COPY(m_bStealthPastReceptors);
 #undef APPROACH
@@ -388,6 +392,8 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 		AddPart(AddTo, m_fConfusionZ[i], s);
 		s = ssprintf("Reverse%d", i + 1);
 		AddPart(AddTo, m_fReverse[i], s);
+		s = ssprintf("Dark%d", i + 1);
+		AddPart(AddTo, m_fDarks[i], s);
 	}
 
 	if (m_bTurns[TURN_MIRROR])
@@ -994,9 +1000,19 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 		m_bTransforms[TRANSFORM_NOLIFTS] = on;
 	else if (sBit == "nofakes")
 		m_bTransforms[TRANSFORM_NOFAKES] = on;
-	else if (sBit == "dark")
-		SET_FLOAT(fDark)
-	else if (sBit == "blind")
+	else if (sBit.find("dark") != sBit.npos) {
+		if (sBit == "dark")
+			SET_FLOAT(fDark)
+		else {
+			for (int i = 0; i < 16; i++) {
+				sMod = ssprintf("dark%d", i + 1);
+				if (sBit == sMod) {
+					SET_FLOAT(fDarks[i])
+					break;
+				}
+			}
+		}
+	} else if (sBit == "blind")
 		SET_FLOAT(fBlind)
 	else if (sBit == "cover")
 		SET_FLOAT(fCover)
@@ -1382,6 +1398,8 @@ PlayerOptions::operator==(const PlayerOptions& other) const
 		COMPARE(m_fStealth[i]);
 	for (int i = 0; i < 16; ++i)
 		COMPARE(m_fReverse[i]);
+	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fDarks[i]);
 #undef COMPARE
 	return true;
 }
@@ -1468,6 +1486,9 @@ PlayerOptions::operator=(PlayerOptions const& other)
 	}
 	for (int i = 0; i < 16; ++i) {
 		CPY_SPEED(fReverse[i]);
+	}
+	for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fDarks[i]);
 	}
 #undef CPY
 #undef CPY_SPEED
@@ -1956,6 +1977,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	MULTICOL_FLOAT_INTERFACE(ConfusionOffset, ConfusionZ, true);
 	MULTICOL_FLOAT_INTERFACE(Stealth, Stealth, true);
 	MULTICOL_FLOAT_INTERFACE(Reverse, Reverse, true);
+	MULTICOL_FLOAT_INTERFACE(Dark, Darks, true);
 
 	BOOL_INTERFACE(TurnNone, Turns[PlayerOptions::TURN_NONE]);
 	BOOL_INTERFACE(Mirror, Turns[PlayerOptions::TURN_MIRROR]);
@@ -2430,11 +2452,11 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(Passmark);
 		ADD_METHOD(RandomSpeed);
 
-		ADD_MULTICOL_METHOD(MoveX); // functional, verified!
-		ADD_MULTICOL_METHOD(MoveY); // functional, verified!
-		ADD_MULTICOL_METHOD(MoveZ); // functional, verified!
-		ADD_MULTICOL_METHOD(Bumpy);
-		ADD_MULTICOL_METHOD(Tiny);
+		ADD_MULTICOL_METHOD(MoveX);			   // functional, verified!
+		ADD_MULTICOL_METHOD(MoveY);			   // functional, verified!
+		ADD_MULTICOL_METHOD(MoveZ);			   // functional, verified!
+		ADD_MULTICOL_METHOD(Bumpy);			   // functional, verified!
+		ADD_MULTICOL_METHOD(Tiny);			   // functional, verified!
 		ADD_MULTICOL_METHOD(ConfusionOffset);  // functional, verified!
 		ADD_MULTICOL_METHOD(ConfusionXOffset); // functional and verified
 											   // but doesn't auto reset
@@ -2442,6 +2464,7 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_MULTICOL_METHOD(ConfusionYOffset); // functional, verified!
 		ADD_MULTICOL_METHOD(Stealth);		   // functional, verified!
 		ADD_MULTICOL_METHOD(Reverse);		   // functional, verified!
+		ADD_MULTICOL_METHOD(Dark);			   // functional, verified!
 
 		ADD_METHOD(NoteSkin);
 		ADD_METHOD(MuteOnError);
