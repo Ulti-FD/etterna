@@ -860,6 +860,21 @@ RageFastCsc(float x)
 }
 
 float
+RageTriangle(float angle)
+{
+	float fAngle = fmod(angle, PI * 2.0f);
+	if (fAngle < 0.0)
+		fAngle += PI * 2.0;
+	double result = fAngle * (1 / PI);
+	if (result < .5)
+		return result * 2.0;
+	else if (result < 1.5)
+		return 1.0 - ((result - .5) * 2.0);
+	else
+		return -4.0 + (result * 2.0);
+}
+
+float
 RageQuadratic::Evaluate(float fT) const
 {
 	// optimized (m_fA * fT*fT*fT) + (m_fB * fT*fT) + (m_fC * fT) + m_fD;

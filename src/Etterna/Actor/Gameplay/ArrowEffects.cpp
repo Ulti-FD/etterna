@@ -716,6 +716,15 @@ ArrowEffects::GetXPos(const PlayerState* pPlayerState,
 							fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_PERIOD]),
 						  curr_options->m_bCosecant)) /
 		  (fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_STEPS] + 1);
+	if (fEffects[PlayerOptions::EFFECT_ZIGZAG] != 0) {
+		float fResult = RageTriangle(
+		  (PI * (1 / (fEffects[PlayerOptions::EFFECT_ZIGZAG_PERIOD] + 1)) *
+		   ((fYOffset +
+			 (100.0f * (fEffects[PlayerOptions::EFFECT_ZIGZAG_OFFSET]))) /
+			ARROW_SIZE)));
+		fPixelOffsetFromCenter +=
+		  (fEffects[PlayerOptions::EFFECT_ZIGZAG] * ARROW_SIZE / 2) * fResult;
+	}
 
 	return fPixelOffsetFromCenter;
 }
@@ -1127,6 +1136,15 @@ ArrowEffects::GetZPos(const PlayerState* pPlayerState, int iCol, float fYOffset)
 					fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_PERIOD]),
 				  curr_options->m_bCosecant)) /
 		  (fEffects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_STEPS] + 1);
+	if (fEffects[PlayerOptions::EFFECT_ZIGZAG_Z] != 0) {
+		float fResult = RageTriangle(
+		  (PI * (1 / (fEffects[PlayerOptions::EFFECT_ZIGZAG_Z_PERIOD] + 1)) *
+		   ((fYOffset +
+			 (100.0f * (fEffects[PlayerOptions::EFFECT_ZIGZAG_Z_OFFSET]))) /
+			ARROW_SIZE)));
+		fZPos +=
+		  (fEffects[PlayerOptions::EFFECT_ZIGZAG_Z] * ARROW_SIZE / 2) * fResult;
+	}
 
 	return fZPos;
 }
@@ -1143,6 +1161,8 @@ ArrowEffects::NeedZBuffer()
 	if (fEffects[PlayerOptions::EFFECT_ATTENUATE_Z] != 0)
 		return true;
 	if (fEffects[PlayerOptions::EFFECT_DIGITAL_Z] != 0)
+		return true;
+	if (fEffects[PlayerOptions::EFFECT_ZIGZAG_Z] != 0)
 		return true;
 
 	return false;

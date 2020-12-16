@@ -320,6 +320,12 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	  AddTo, m_fEffects[EFFECT_TAN_DIGITAL_Z_PERIOD], "TanDigitalZPeriod");
 	AddPart(
 	  AddTo, m_fEffects[EFFECT_TAN_DIGITAL_Z_OFFSET], "TanDigitalZOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG], "Zigzag");
+	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG_PERIOD], "ZigzagPeriod");
+	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG_OFFSET], "ZigzagOffset");
+	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG_Z], "ZigzagZ");
+	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG_Z_PERIOD], "ZigzagZPeriod");
+	AddPart(AddTo, m_fEffects[EFFECT_ZIGZAG_Z_OFFSET], "ZigzagZOffset");
 
 	AddPart(AddTo, m_fAppearances[APPEARANCE_HIDDEN], "Hidden");
 	AddPart(AddTo, m_fAppearances[APPEARANCE_HIDDEN_OFFSET], "HiddenOffset");
@@ -839,6 +845,19 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_Z_PERIOD])
 		else if (sBit == "tandigitalzoffset")
 			SET_FLOAT(fEffects[EFFECT_TAN_DIGITAL_Z_OFFSET])
+	} else if (sBit.find("zigzag") != sBit.npos) {
+		if (sBit == "zigzag")
+			SET_FLOAT(fEffects[EFFECT_ZIGZAG])
+		else if (sBit == "zigzagperiod")
+			SET_FLOAT(fEffects[EFFECT_ZIGZAG_PERIOD])
+		else if (sBit == "zigzagoffset")
+			SET_FLOAT(fEffects[EFFECT_ZIGZAG_OFFSET])
+		else if (sBit == "zigzagz")
+			SET_FLOAT(fEffects[EFFECT_ZIGZAG_Z])
+		else if (sBit == "zigzagzperiod")
+			SET_FLOAT(fEffects[EFFECT_ZIGZAG_Z_PERIOD])
+		else if (sBit == "zigzagzoffset")
+			SET_FLOAT(fEffects[EFFECT_ZIGZAG_Z_OFFSET])
 	}
 
 	else if (sBit == "blink")
@@ -1795,6 +1814,20 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(TanDigitalZOffset,
 					Effects[PlayerOptions::EFFECT_TAN_DIGITAL_Z_OFFSET],
 					true);
+	FLOAT_INTERFACE(Zigzag, Effects[PlayerOptions::EFFECT_ZIGZAG], true);
+	FLOAT_INTERFACE(ZigzagPeriod,
+					Effects[PlayerOptions::EFFECT_ZIGZAG_PERIOD],
+					true);
+	FLOAT_INTERFACE(ZigzagOffset,
+					Effects[PlayerOptions::EFFECT_ZIGZAG_OFFSET],
+					true);
+	FLOAT_INTERFACE(ZigzagZ, Effects[PlayerOptions::EFFECT_ZIGZAG_Z], true);
+	FLOAT_INTERFACE(ZigzagZPeriod,
+					Effects[PlayerOptions::EFFECT_ZIGZAG_Z_PERIOD],
+					true);
+	FLOAT_INTERFACE(ZigzagZOffset,
+					Effects[PlayerOptions::EFFECT_ZIGZAG_Z_OFFSET],
+					true);
 
 	FLOAT_INTERFACE(Hidden,
 					Appearances[PlayerOptions::APPEARANCE_HIDDEN],
@@ -2234,6 +2267,12 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(TanDigitalZSteps);  // functional but needs verification
 		ADD_METHOD(TanDigitalZPeriod); // functional but needs verification
 		ADD_METHOD(TanDigitalZOffset); // functional but needs verification
+		ADD_METHOD(Zigzag);			   // functional but needs verification
+		ADD_METHOD(ZigzagPeriod);	   // functional but needs verification
+		ADD_METHOD(ZigzagOffset);	   // functional but needs verification
+		ADD_METHOD(ZigzagZ);		   // functional but needs verification
+		ADD_METHOD(ZigzagZPeriod);	   // functional but needs verification
+		ADD_METHOD(ZigzagZOffset);	   // functional but needs verification
 
 		ADD_METHOD(Hidden);
 		ADD_METHOD(HiddenOffset);
