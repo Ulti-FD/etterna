@@ -94,9 +94,9 @@ OptionsCursor::StopTweening()
 }
 
 void
-OptionsCursor::BeginTweening(float fSecs)
+OptionsCursor::BeginTweening(float fSecs, TweenType tt)
 {
-	ActorFrame::BeginTweening(fSecs);
+	ActorFrame::BeginTweening(fSecs,tt);
 
 	m_sprMiddle->BeginTweening(fSecs);
 	m_sprLeft->BeginTweening(fSecs);
@@ -112,7 +112,7 @@ void
 OptionsCursor::SetBarWidth(int iWidth)
 {
 	float fWidth =
-	  ceilf(iWidth / 2.0f) * 2.0f; // round up to nearest even number
+	  ceilf(iWidth / 2.0f) * 1.8f; // round up to nearest even number
 
 	m_sprMiddle->ZoomToWidth(fWidth);
 
