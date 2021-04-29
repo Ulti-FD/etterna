@@ -153,7 +153,7 @@ t[#t + 1] =
 t[#t + 1] =
 	LoadFont("Common Normal") .. {
 		InitCommand = function(self)
-			self:xy(frameX + offsetX/3, frameY + offsetY - 11):zoom(0.65):halign(0):diffuse(getMainColor("positive"))
+			self:xy(frameX + offsetX/2, frameY + offsetY - 11):zoom(0.65):halign(0):diffuse(getMainColor("positive"))
 			self:settext(translated_text["Title"])
 		end
 	}

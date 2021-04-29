@@ -26,7 +26,7 @@ local nestedTabButtonWidth = 153
 local nestedTabButtonHeight = 20
 local netPageButtonWidth = 50
 local netPageButtonHeight = 50
-local headeroffY = 26 / 1.5
+local headeroffY = 10
 
 local selectedrateonly
 
@@ -377,7 +377,7 @@ local l =
 		{
 			Name = "Grades",
 			InitCommand = function(self)
-				self:y(20):zoom(0.6):halign(0):maxwidth(50 / 0.6):settext("")
+				self:y(20):zoom(0.65):halign(0):maxwidth(60 / 0.65):settext("")
 			end,
 			DisplayCommand = function(self)
 				self:settext(THEME:GetString("Grade", ToEnumShortString(score:GetWifeGrade())))
@@ -389,7 +389,7 @@ local l =
 		{
 			Name = "Wife",
 			InitCommand = function(self)
-				self:xy(55, 15):zoom(0.6):halign(0):settext("")
+				self:xy(65, 15):zoom(0.6):halign(0):settext("")
 			end,
 			DisplayCommand = function(self)
 				if score:GetWifeScore() == 0 then
@@ -413,7 +413,7 @@ local l =
 		{
 			Name = "Score",
 			InitCommand = function(self)
-				self:xy(55, 30):zoom(0.6):halign(0):settext("")
+				self:xy(65, 30):zoom(0.6):halign(0):settext("")
 			end,
 			DisplayCommand = function(self)
 				if score:GetWifeScore() == 0 then
@@ -428,7 +428,7 @@ local l =
 		{
 			Name = "Score",
 			InitCommand = function(self)
-				self:xy(55, 43):zoom(0.5):halign(0):settext("")
+				self:xy(65, 43):zoom(0.5):halign(0):settext("")
 			end,
 			DisplayCommand = function(self)
 				if score:GetWifeScore() == 0 then
@@ -447,7 +447,7 @@ local l =
 		{
 			Name = "ClearType",
 			InitCommand = function(self)
-				self:y(43):zoom(0.5):halign(0):settext(""):diffuse(color(colorConfig:get_data().clearType["NoPlay"]))
+				self:y(44):zoom(0.5):halign(0):settext(""):diffuse(color(colorConfig:get_data().clearType["NoPlay"]))
 			end,
 			DisplayCommand = function(self)
 				self:settext(getClearTypeFromScore(pn, score, 0))
@@ -456,9 +456,29 @@ local l =
 		},
 	LoadFont("Common Normal") ..
 		{
+			Name = "Mods",
+			InitCommand = function(self)
+				self:y(63):zoom(0.4):halign(0):settextf("%s:", translated_info["Mods"])
+			end,
+			DisplayCommand = function(self)
+				self:settextf("%s: %s", translated_info["Mods"], getModifierTranslations(score:GetModifiers()))
+			end
+		},
+	LoadFont("Common Normal") ..
+		{
+			Name = "Date",
+			InitCommand = function(self)
+				self:y(78):zoom(0.4):halign(0):settextf("%s:", translated_info["DateAchieved"])
+			end,
+			DisplayCommand = function(self)
+				self:settextf("%s: %s", translated_info["DateAchieved"], getScoreDate(score))
+			end
+		},
+	LoadFont("Common Normal") ..
+		{
 			Name = "Combo",
 			InitCommand = function(self)
-				self:y(58):zoom(0.4):halign(0):settextf("%s:", translated_info["MaxCombo"])
+				self:y(93):zoom(0.4):halign(0):settextf("%s:", translated_info["MaxCombo"])
 			end,
 			DisplayCommand = function(self)
 				self:settextf("%s: %d", translated_info["MaxCombo"], score:GetMaxCombo())
@@ -468,7 +488,7 @@ local l =
 		{
 			Name = "ComboBreaks",
 			InitCommand = function(self)
-				self:y(73):zoom(0.4):halign(0):settextf("%s:", translated_info["ComboBreaks"])
+				self:y(108):zoom(0.4):halign(0):settextf("%s:", translated_info["ComboBreaks"])
 			end,
 			DisplayCommand = function(self)
 				local comboBreaks = getScoreComboBreaks(score)
@@ -477,26 +497,6 @@ local l =
 				else
 					self:settextf("%s: -", translated_info["ComboBreaks"])
 				end
-			end
-		},
-	LoadFont("Common Normal") ..
-		{
-			Name = "Date",
-			InitCommand = function(self)
-				self:y(88):zoom(0.4):halign(0):settextf("%s:", translated_info["DateAchieved"])
-			end,
-			DisplayCommand = function(self)
-				self:settextf("%s: %s", translated_info["DateAchieved"], getScoreDate(score))
-			end
-		},
-	LoadFont("Common Normal") ..
-		{
-			Name = "Mods",
-			InitCommand = function(self)
-				self:y(103):zoom(0.4):halign(0):settextf("%s:", translated_info["Mods"])
-			end,
-			DisplayCommand = function(self)
-				self:settextf("%s: %s", translated_info["Mods"], getModifierTranslations(score:GetModifiers()))
 			end
 		},
 	LoadFont("Common Normal") ..
@@ -511,9 +511,22 @@ local l =
 		},
 	LoadFont("Common Normal") ..
 		{
+			Name = "Judge",
+			InitCommand = function(self)
+				self:xy(frameX + offsetX + 55,frameHeight - headeroffY - 65 - offsetY):zoom(0.45):halign(0.5):settext("")
+			end,
+			DisplayCommand = function(self)
+				local j = table.find(ms.JudgeScalers, notShit.round(score:GetJudgeScale(), 2))
+				if not j then j = 4 end
+				if j < 4 then j = 4 end
+				self:settextf("%s %i", translated_info["Judge"], j)
+			end
+		},
+	LoadFont("Common Normal") ..
+		{
 			Name = "ChordCohesion",
 			InitCommand = function(self)
-				self:y(frameHeight - headeroffY - 10 - offsetY):zoom(0.4):halign(0):settextf("%s:", translated_info["ChordCohesion"])
+				self:xy(frameX + offsetX + 55,frameHeight - headeroffY - 50 - offsetY):zoom(0.4):halign(0.5):settextf("%s:", translated_info["ChordCohesion"])
 			end,
 			DisplayCommand = function(self)
 				if score:GetChordCohesion() then
@@ -523,19 +536,6 @@ local l =
 				end
 			end
 		},
-	LoadFont("Common Normal") ..
-		{
-			Name = "Judge",
-			InitCommand = function(self)
-				self:xy((frameWidth - offsetX - frameX) / 2, frameHeight - headeroffY - 10 - offsetY):zoom(0.4):settext("")
-			end,
-			DisplayCommand = function(self)
-				local j = table.find(ms.JudgeScalers, notShit.round(score:GetJudgeScale(), 2))
-				if not j then j = 4 end
-				if j < 4 then j = 4 end
-				self:settextf("%s %i", translated_info["Judge"], j)
-			end
-		}
 }
 
 local function makeText(index)
@@ -581,7 +581,7 @@ local function makeJudge(index, judge)
 	local t =
 		Def.ActorFrame {
 		InitCommand = function(self)
-			self:y(125 + ((index - 1) * 18))
+			self:y(129 + ((index - 1) * 18))
 		end
 	}
 
@@ -590,7 +590,7 @@ local function makeJudge(index, judge)
 		LoadFont("Common Normal") ..
 		{
 			InitCommand = function(self)
-				self:zoom(0.5):halign(0)
+				self:zoom(0.55):halign(0)
 			end,
 			BeginCommand = function(self)
 				self:settext(getJudgeStrings(judge))
@@ -602,7 +602,7 @@ local function makeJudge(index, judge)
 		LoadFont("Common Normal") ..
 		{
 			InitCommand = function(self)
-				self:x(120):zoom(0.5):halign(1):settext("0")
+				self:x(127):zoom(0.55):halign(1):settext("0")
 			end,
 			DisplayCommand = function(self)
 				if judge ~= "HoldNoteScore_Held" and judge ~= "HoldNoteScore_LetGo" then
@@ -617,7 +617,7 @@ local function makeJudge(index, judge)
 		LoadFont("Common Normal") ..
 		{
 			InitCommand = function(self)
-				self:x(122):zoom(0.3):halign(0):settext("")
+				self:x(130):zoom(0.3):halign(0):settext("")
 			end,
 			DisplayCommand = function(self)
 				if judge ~= "HoldNoteScore_Held" and judge ~= "HoldNoteScore_LetGo" then
@@ -644,7 +644,7 @@ l[#l + 1] =
 	{
 		Name = "Score",
 		InitCommand = function(self)
-			self:y(frameHeight - headeroffY - 30 - offsetY):zoom(0.5):halign(0):settext("")
+			self:y(frameHeight - headeroffY - 27 - offsetY):zoom(0.5):halign(0):settext("")
 		end,
 		DisplayCommand = function(self)
 			if hasReplayData then
@@ -669,7 +669,7 @@ l[#l + 1] =
 	{
 		Name = "ReplayViewer",
 		InitCommand = function(self)
-			self:xy((frameWidth - offsetX - frameX) / 2, frameHeight - headeroffY - 30 - offsetY):zoom(0.5):settext("")
+			self:y(frameHeight - headeroffY - 12 - offsetY):zoom(0.5):halign(0):settext("")
 		end,
 		BeginCommand = function(self)
 			if SCREENMAN:GetTopScreen():GetName() == "ScreenNetSelectMusic" then
@@ -695,42 +695,51 @@ l[#l + 1] =
 		end
 	}
 l[#l + 1] =
-	LoadFont("Common Normal") ..
-	{
-		Name = "EvalViewer",
-		InitCommand = function(self)
-			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 30 - offsetY):zoom(0.5):halign(1):settext("")
-		end,
-		BeginCommand = function(self)
-			if SCREENMAN:GetTopScreen():GetName() == "ScreenNetSelectMusic" then
-				self:visible(false)
-			end
-		end,
-		DisplayCommand = function(self)
-			if hasReplayData then
-				self:settext(translated_info["ShowEval"])
-			else
-				self:settext("")
-			end
-		end,
-		HighlightCommand = function(self)
-			highlightIfOver(self)
-		end,
-		MouseLeftClickMessageCommand = function(self)
-			if nestedTab == 1 then
-				if getTabIndex() == 2 and getScoreForPlot() and hasReplayData and isOver(self) then
-					SCREENMAN:GetTopScreen():ShowEvalScreenForScore(score)
-				end
-			end
-		end
-	}
+	Def.ActorFrame {
+        Def.Quad {
+            Name = "EvalViewHighlight",
+            InitCommand = function(self)
+                self:xy((frameWidth - offsetX - frameX) / 2.1, frameHeight - headeroffY - 14 - offsetY):diffuse(0,0,0,.3)
+                self:zoomtowidth(145):zoomtoheight(21)
+            end,
+        },
+        LoadFont("Common Large") ..
+        {
+            Name = "EvalViewer",
+            InitCommand = function(self)
+                self:xy((frameWidth - offsetX - frameX) / 2.1, frameHeight - headeroffY - 15 - offsetY):zoom(0.35):settext("")
+            end,
+            BeginCommand = function(self)
+                if SCREENMAN:GetTopScreen():GetName() == "ScreenNetSelectMusic" then
+                    self:visible(false)
+                end
+            end,
+            DisplayCommand = function(self)
+                if hasReplayData then
+                    self:settext(translated_info["ShowEval"])
+                else
+                    self:settext("")
+                end
+            end,
+            HighlightCommand = function(self)
+                highlightIfOver(self)
+            end,
+            MouseLeftClickMessageCommand = function(self)
+                if nestedTab == 1 then
+                    if getTabIndex() == 2 and getScoreForPlot() and hasReplayData and isOver(self) then
+                        SCREENMAN:GetTopScreen():ShowEvalScreenForScore(score)
+                    end
+                end
+            end
+        },
+    }
 
 l[#l + 1] =
 	LoadFont("Common Normal") ..
 	{
 		Name = "TheDootButton",
 		InitCommand = function(self)
-			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 45 - offsetY):zoom(0.45):halign(1):settext("")
+			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 38 - offsetY):zoom(0.45):halign(1):settext("")
 		end,
 		DisplayCommand = function(self)
 			if hasReplayData then
@@ -756,7 +765,7 @@ l[#l + 1] =
 	{
 		Name = "TheDootButtonTWO",
 		InitCommand = function(self)
-			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 56 - offsetY):zoom(0.45):halign(1):settext("")
+			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 57 - offsetY):zoom(0.45):halign(1):settext("")
 		end,
 		DisplayCommand = function(self)
 			self:settext("Upload all scores for this chart")
@@ -777,7 +786,7 @@ l[#l + 1] =
 	{
 		Name = "TheDootButtonTHREEEEEEEE",
 		InitCommand = function(self)
-			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 67 - offsetY):zoom(0.45):halign(1):settext("")
+			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 71 - offsetY):zoom(0.45):halign(1):settext("")
 		end,
 		DisplayCommand = function(self)
 			self:settext("Upload all scores for charts in this pack")
@@ -798,7 +807,7 @@ l[#l + 1] =
 	{
 		Name = "TheDootButtonFOUR",
 		InitCommand = function(self)
-			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 78 - offsetY):zoom(0.45):halign(1):settext("")
+			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 85 - offsetY):zoom(0.45):halign(1):settext("")
 		end,
 		DisplayCommand = function(self)
 			self:settext("MOVE EVERY ZIG")
@@ -824,9 +833,9 @@ t[#t + 1] =
 	end,
 	DisplayCommand = function(self)
 		self:finishtweening()
-		self:smooth(0.2)
-		self:zoomy(((frameHeight) / #rtTable[rates[rateIndex]]))
-		self:y((((frameHeight) / #rtTable[rates[rateIndex]]) * scoreIndex))
+		self:smooth(0.15)
+		self:zoomy(((frameHeight - offsetY) / #rtTable[rates[rateIndex]]))
+		self:y((((frameHeight - offsetY) / #rtTable[rates[rateIndex]]) * scoreIndex) + offsetY)
 	end
 }
 
@@ -835,8 +844,7 @@ ret[#ret + 1] = t
 function nestedTabButton(i)
 	return Def.ActorFrame {
 		InitCommand = function(self)
-			self:xy(frameX + offsetX + (i - 1) * (nestedTabButtonWidth - capWideScale(100, 80)), frameY + offsetY - 2)
-			self:SetUpdateFunction(highlight)
+			self:xy(frameX + offsetX/2 + (i - 1) * (nestedTabButtonWidth - capWideScale(100, 80)), frameY + offsetY - 4)
 			self:SetUpdateFunctionInterval(0.025)
 		end,
 		CollapseCommand = function(self)
