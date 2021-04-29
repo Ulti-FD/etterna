@@ -266,7 +266,7 @@ function getScoreHoldNoteScore(score, tns)
 	end
 end
 
-function getScoreMissCount(score)
+function getScoreComboBreaks(score)
 	return getScoreTapNoteScore(score, "TapNoteScore_Miss") + getScoreTapNoteScore(score, "TapNoteScore_W5") +
 		getScoreTapNoteScore(score, "TapNoteScore_W4")
 end
