@@ -8,10 +8,11 @@ local frameWidth = SCREEN_WIDTH * 0.56
 local frameHeight = 368
 local fontScale = 0.4
 local distY = 15
-local offsetX = 10
+local offsetX = 9
 local offsetY = 20
 local pn = GAMESTATE:GetEnabledPlayers()[1]
 local greatest = 0
+local txtDist = 27
 local steps
 local meter = {}
 meter[1] = 0.00
@@ -97,7 +98,7 @@ local function littlebits(i)
 		LoadFont("Common Large") ..
 			{
 				InitCommand = function(self)
-					self:xy(frameX + offsetX, frameY + 120 + 22 * i):halign(0):valign(0):zoom(0.5):maxwidth(160 / 0.6)
+					self:xy(frameX + offsetX, frameY + 120 + txtDist * i):halign(0):valign(0):zoom(0.5):maxwidth(160 / 0.6)
 				end,
 				SetCommand = function(self)
 					--skillset name
@@ -121,7 +122,7 @@ local function littlebits(i)
 		LoadFont("Common Large") ..
 			{
 				InitCommand = function(self)
-					self:xy(frameX + 225, frameY + 120 + 22 * i):halign(1):valign(0):zoom(0.5):maxwidth(110 / 0.6)
+					self:xy(frameX + 225, frameY + 120 + txtDist * i):halign(1):valign(0):zoom(0.5):maxwidth(110 / 0.6)
 				end,
 				SetCommand = function(self)
 					if song and steps then
@@ -152,14 +153,14 @@ t[#t + 1] =
 t[#t + 1] =
 	LoadFont("Common Normal") .. {
 		InitCommand = function(self)
-			self:xy(frameX + 5, frameY + offsetY - 9):zoom(0.6):halign(0):diffuse(getMainColor("positive"))
+			self:xy(frameX + offsetX/3, frameY + offsetY - 11):zoom(0.65):halign(0):diffuse(getMainColor("positive"))
 			self:settext(translated_text["Title"])
 		end
 	}
 t[#t + 1] =
 	LoadFont("Common Large") .. {
 		InitCommand = function(self)
-			self:xy(frameX + 5, frameY + 35):zoom(0.6):halign(0):diffuse(getMainColor("positive")):maxwidth(
+			self:xy(frameX + offsetX, frameY + 35):zoom(0.6):halign(0):diffuse(getMainColor("positive")):maxwidth(
 				SCREEN_CENTER_X / 0.7
 			)
 		end,
@@ -177,7 +178,7 @@ t[#t + 1] =
 	LoadFont("Common Large") ..
 	{
 		InitCommand = function(self)
-			self:xy(frameX + offsetX, frameY + offsetY + 65):visible(true):halign(0):zoom(0.4):maxwidth(
+			self:xy(frameX + offsetX, frameY + offsetY + 62):visible(true):halign(0):zoom(0.4):maxwidth(
 				capWideScale(get43size(360), 360) / capWideScale(get43size(0.45), 0.45)
 			)
 		end,
@@ -191,7 +192,7 @@ t[#t + 1] =
 	LoadFont("Common Normal") .. {
 		Name = "StepsAndMeter",
 		InitCommand = function(self)
-			self:xy(frameX + offsetX, frameY + offsetY + 50):zoom(0.5):halign(0)
+			self:xy(frameX + offsetX, frameY + offsetY + 44):zoom(0.5):halign(0)
 		end,
 		SetCommand = function(self)
 			steps = GAMESTATE:GetCurrentSteps()
@@ -212,7 +213,7 @@ t[#t + 1] =
 	LoadFont("Common Normal") .. {
 		Name = "NPS",
 		InitCommand = function(self)
-			self:xy(frameX + offsetX, frameY + 60):zoom(0.4):halign(0)
+			self:xy(frameX + offsetX + 165, frameY + offsetY + 44):zoom(0.45):halign(0)
 		end,
 		SetCommand = function(self)
 			steps = GAMESTATE:GetCurrentSteps()
@@ -232,9 +233,9 @@ t[#t + 1] =
 
 --Negative BPMs label
 t[#t + 1] =
-	LoadFont("Common Normal") .. {
+	LoadFont("Common Large") .. {
 		InitCommand = function(self)
-			self:xy(frameX + 45, frameY + 135):zoom(0.8):halign(0):diffuse(getMainColor("negative")):settext("Negative Bpms")
+			self:xy(frameX + 45, frameY + 165):zoom(0.5):halign(0):diffuse(getMainColor("negative")):settext("Negative Bpms")
 		end,
 		SetCommand = function(self)
 			if steps and steps:GetTimingData():HasWarps() then
