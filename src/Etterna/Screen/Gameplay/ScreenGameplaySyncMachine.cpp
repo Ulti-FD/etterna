@@ -151,12 +151,12 @@ ScreenGameplaySyncMachine::RefreshText()
 	float fOld = AdjustSync::s_fGlobalOffsetSecondsOriginal;
 	float fStdDev = AdjustSync::s_fStandardDeviation*1000;
 	std::string s;
-    s += ssprintf("%0.3f | ", fOld) + OLD_OFFSET.GetValue() + "\n";
-    s += ssprintf("%0.3f | ", fNew) + NEW_OFFSET.GetValue() + "\n";
-    s += ssprintf("%04.1fms | ", fStdDev) + STANDARD_DEVIATION.GetValue()
-                                                                + "\n";
-    s += ssprintf("%02d / %d | ", AdjustSync::s_iAutosyncOffsetSample,
-        AdjustSync::OFFSET_SAMPLE_COUNT) + COLLECTING_SAMPLE.GetValue()
+	s += ssprintf("%0.3f | ", fOld) + OLD_OFFSET.GetValue() + "\n";
+	s += ssprintf("%0.3f | ", fNew) + NEW_OFFSET.GetValue() + "\n";
+	s += ssprintf("%04.1fms | ", fStdDev) + STANDARD_DEVIATION.GetValue()
+																+ "\n";
+	s += ssprintf("%02d / %d | ", AdjustSync::s_iAutosyncOffsetSample,
+		AdjustSync::OFFSET_SAMPLE_COUNT) + COLLECTING_SAMPLE.GetValue()
 																+ "\n";
 
 	m_textSyncInfo.SetText(s);

@@ -1471,7 +1471,7 @@ static const Game g_Game_Popn = {
 };
 
 static const Game* g_Games[] = {
-	&g_Game_Dance, &g_Game_Solo, &g_Game_KB7, &g_Game_Pump, &g_Game_Beat,  	 
+	&g_Game_Dance, &g_Game_Solo, &g_Game_KB7, &g_Game_Pump, &g_Game_Beat,
 	&g_Game_Popn, &g_Game_Ez2, &g_Game_DS3DDX, &g_Game_Maniax,
 };
 

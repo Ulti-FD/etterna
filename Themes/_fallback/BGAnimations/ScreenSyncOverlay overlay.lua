@@ -26,15 +26,15 @@ return Def.ActorFrame {
 		InitCommand = function(self)
 			local text = {
 				revert_sync_changes .. ":",
-				"    F4",
+				"   F4",
 				change_song_offset .. ":",
-				"    F11/F12",
+				"   F11/F12",
 				change_machine_offset .. ":",
-				"    Shift + F11/F12",
+				"   Shift + F11/F12",
 				hold_alt
 			}
 			self:diffuse(1,1,1,0):horizalign(left):vertalign(top):shadowlength(2):settext(table.concat(text, "\n"))
-               :zoom(math.min(1,0.7*sh_r)):xy( _screen.w - self:GetZoomedWidth() - 10, 10 )
+			   :zoom(math.min(1,0.7*sh_r)):xy( _screen.w - self:GetZoomedWidth() - 10, 10 )
 			local quad = self:GetParent():GetChild("quad")
 			quad:zoomtowidth(self:GetZoomedWidth() + 20):zoomtoheight(self:GetZoomedHeight() + 20)
 		end,
@@ -56,11 +56,11 @@ return Def.ActorFrame {
 		end,
 		SetStatusCommand = function(self, param)
 			self:settext(param.text)
-            if GAMESTATE:GetPlayerState():GetCurrentPlayerOptions():UsingReverse() == true then
-                self:y(SCREEN_CENTER_Y-160*sh_r)
-            else
-                self:y(SCREEN_CENTER_Y+160*sh_r)
-            end
+			if GAMESTATE:GetPlayerState():GetCurrentPlayerOptions():UsingReverse() == true then
+				self:y(SCREEN_CENTER_Y-160*sh_r)
+			else
+				self:y(SCREEN_CENTER_Y+160*sh_r)
+			end
 		end,
 		HideCommand = function(self)
 			self:settext("")
@@ -75,18 +75,18 @@ return Def.ActorFrame {
 		end,
 		SetAdjustmentsCommand = function(self, param)
 			self:visible(param.visible):settext(param.text)
-            if param.visible and showadj then
-                if SCREEN_WIDTH/SCREEN_HEIGHT < 5.02/4 then
-                    self:zoom(0.25*sh_r):bounceend(0.05):zoom(math.min(1,0.55*sh_r))
-                elseif SCREEN_WIDTH/SCREEN_HEIGHT < 4.02/3 then
-                    self:zoom(0.25*sh_r):bounceend(0.05):zoom(math.min(1,0.65*sh_r))
-                else
-                    self:zoom(0.25*sh_r):bounceend(0.05):zoom(math.min(1,0.85*sh_r))
-                end
-                showadj = false
-            elseif not param.visible then
-                showadj = true
-            end
+			if param.visible and showadj then
+				if SCREEN_WIDTH/SCREEN_HEIGHT < 5.02/4 then
+					self:zoom(0.25*sh_r):bounceend(0.05):zoom(math.min(1,0.55*sh_r))
+				elseif SCREEN_WIDTH/SCREEN_HEIGHT < 4.02/3 then
+					self:zoom(0.25*sh_r):bounceend(0.05):zoom(math.min(1,0.65*sh_r))
+				else
+					self:zoom(0.25*sh_r):bounceend(0.05):zoom(math.min(1,0.85*sh_r))
+				end
+				showadj = false
+			elseif not param.visible then
+				showadj = true
+			end
 		end,
 		HideCommand = function(self)
 			self:settext("")

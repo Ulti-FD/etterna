@@ -134,14 +134,14 @@ ScreenSyncOverlay::UpdateText(bool forcedChange)
 	  GAMESTATE->m_SongOptions.GetCurrent().m_AutosyncType != AutosyncType_Off;
 	std::string s;
 	if (visible) {
-        // Offset text removed due to clutter, Status text already shows it
-        // If you're considering putting it back, figure out how to make
-        // the offset variables change (global/song sync) first -ulti_fd
+		// Offset text removed due to clutter, Status text already shows it
+		// If you're considering putting it back, figure out how to make
+		// the offset variables change (global/song sync) first -ulti_fd
 
 		//float fNew = PREFSMAN->m_fGlobalOffsetSeconds;
 		//float fOld = AdjustSync::s_fGlobalOffsetSecondsOriginal;
 		float fStdDev = AdjustSync::s_fStandardDeviation*1000;
-        //s += ssprintf("%0.3f | ", fOld) + OLD_OFFSET.GetValue() + "\n";
+		//s += ssprintf("%0.3f | ", fOld) + OLD_OFFSET.GetValue() + "\n";
 		//s += ssprintf("%0.3f | ", fNew) + NEW_OFFSET.GetValue() + "\n";
 		s += ssprintf("%04.1fms | ", fStdDev) + STANDARD_DEVIATION.GetValue()
 																	+ "\n";
