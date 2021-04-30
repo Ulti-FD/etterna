@@ -458,7 +458,7 @@ local l =
 		{
 			Name = "Mods",
 			InitCommand = function(self)
-				self:y(63):zoom(0.4):halign(0):settextf("%s:", translated_info["Mods"])
+				self:y(63):zoom(0.4):halign(0):settextf("%s:", translated_info["Mods"]):settext("")
 			end,
 			DisplayCommand = function(self)
 				self:settextf("%s: %s", translated_info["Mods"], getModifierTranslations(score:GetModifiers()))
@@ -468,7 +468,7 @@ local l =
 		{
 			Name = "Date",
 			InitCommand = function(self)
-				self:y(78):zoom(0.4):halign(0):settextf("%s:", translated_info["DateAchieved"])
+				self:y(78):zoom(0.4):halign(0):settextf("%s:", translated_info["DateAchieved"]):settext("")
 			end,
 			DisplayCommand = function(self)
 				self:settextf("%s: %s", translated_info["DateAchieved"], getScoreDate(score))
@@ -478,7 +478,7 @@ local l =
 		{
 			Name = "Combo",
 			InitCommand = function(self)
-				self:y(93):zoom(0.4):halign(0):settextf("%s:", translated_info["MaxCombo"])
+				self:y(93):zoom(0.4):halign(0):settextf("%s:", translated_info["MaxCombo"]):settext("")
 			end,
 			DisplayCommand = function(self)
 				self:settextf("%s: %d", translated_info["MaxCombo"], score:GetMaxCombo())
@@ -488,7 +488,7 @@ local l =
 		{
 			Name = "ComboBreaks",
 			InitCommand = function(self)
-				self:y(108):zoom(0.4):halign(0):settextf("%s:", translated_info["ComboBreaks"])
+				self:y(108):zoom(0.4):halign(0):settextf("%s:", translated_info["ComboBreaks"]):settext("")
 			end,
 			DisplayCommand = function(self)
 				local comboBreaks = getScoreComboBreaks(score)
@@ -502,11 +502,12 @@ local l =
 	LoadFont("Common Normal") ..
 		{
 			InitCommand = function(self)
-				self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 10 - offsetY):zoom(0.4):halign(1)
+				self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 15 - offsetY):zoom(0.5):halign(1)
 				self:settext(translated_info["NoScores"])
 			end,
 			DisplayCommand = function(self)
 				self:settextf("%s %s - %s %d/%d", translated_info["Rate"], rates[rateIndex], translated_info["Showing"], scoreIndex, #rtTable[rates[rateIndex]])
+				self:zoom(0.4)
 			end
 		},
 	LoadFont("Common Normal") ..
@@ -526,7 +527,7 @@ local l =
 		{
 			Name = "ChordCohesion",
 			InitCommand = function(self)
-				self:xy(frameX + offsetX + 55,frameHeight - headeroffY - 50 - offsetY):zoom(0.4):halign(0.5):settextf("%s:", translated_info["ChordCohesion"])
+				self:xy(frameX + offsetX + 55,frameHeight - headeroffY - 50 - offsetY):zoom(0.4):halign(0.5):settext("")
 			end,
 			DisplayCommand = function(self)
 				if score:GetChordCohesion() then
@@ -542,7 +543,7 @@ local function makeText(index)
 	return LoadFont("Common Normal") ..
 		{
 			InitCommand = function(self)
-				self:xy(frameWidth - frameX, offsetY + 110 + (index * 15)):zoom(fontScale + 0.05):halign(1):settext("")
+				self:xy(frameWidth - frameX, offsetY + 100 + (index * 15)):zoom(fontScale + 0.05):halign(1):settext("")
 			end,
 			DisplayCommand = function(self)
 				local count = 0
@@ -644,17 +645,20 @@ l[#l + 1] =
 	{
 		Name = "Score",
 		InitCommand = function(self)
-			self:y(frameHeight - headeroffY - 27 - offsetY):zoom(0.5):halign(0):settext("")
+			self:y(frameHeight - headeroffY - 30 - offsetY):zoom(0.55):halign(0):settext("")
+			self:diffuse(getMainColor("positive"))
 		end,
 		DisplayCommand = function(self)
 			if hasReplayData then
 				self:settext(translated_info["ShowOffset"])
 			else
-				self:settext(translated_info["NoReplayData"])
+				self:settext("")
 			end
 		end,
 		HighlightCommand = function(self)
-			highlightIfOver(self)
+			if hasReplayData then
+				highlightIfOver(self)
+			end
 		end,
 		MouseLeftClickMessageCommand = function(self)
 			if nestedTab == 1 then
@@ -662,14 +666,15 @@ l[#l + 1] =
 					SCREENMAN:AddNewScreenToTop("ScreenScoreTabOffsetPlot")
 				end
 			end
-		end
+		end,
 	}
 l[#l + 1] =
 	LoadFont("Common Normal") ..
 	{
 		Name = "ReplayViewer",
 		InitCommand = function(self)
-			self:y(frameHeight - headeroffY - 12 - offsetY):zoom(0.5):halign(0):settext("")
+			self:y(frameHeight - headeroffY - 15 - offsetY):zoom(0.55):halign(0):settext("")
+			self:diffuse(getMainColor("positive"))
 		end,
 		BeginCommand = function(self)
 			if SCREENMAN:GetTopScreen():GetName() == "ScreenNetSelectMusic" then
@@ -679,12 +684,16 @@ l[#l + 1] =
 		DisplayCommand = function(self)
 			if hasReplayData then
 				self:settext(translated_info["ShowReplay"])
+				self:diffuse(getMainColor("positive")):zoom(0.55)
 			else
 				self:settext(translated_info["NoReplayData"])
+				self:diffuse(1,1,1,1):zoom(0.4)
 			end
 		end,
 		HighlightCommand = function(self)
-			highlightIfOver(self)
+			if hasReplayData then
+				highlightIfOver(self)
+			end
 		end,
 		MouseLeftClickMessageCommand = function(self)
 			if nestedTab == 1 then
@@ -696,50 +705,63 @@ l[#l + 1] =
 	}
 l[#l + 1] =
 	Def.ActorFrame {
-        Def.Quad {
-            Name = "EvalViewHighlight",
-            InitCommand = function(self)
-                self:xy((frameWidth - offsetX - frameX) / 2.1, frameHeight - headeroffY - 14 - offsetY):diffuse(0,0,0,.3)
-                self:zoomtowidth(145):zoomtoheight(21)
-            end,
-        },
-        LoadFont("Common Large") ..
-        {
-            Name = "EvalViewer",
-            InitCommand = function(self)
-                self:xy((frameWidth - offsetX - frameX) / 2.1, frameHeight - headeroffY - 15 - offsetY):zoom(0.35):settext("")
-            end,
-            BeginCommand = function(self)
-                if SCREENMAN:GetTopScreen():GetName() == "ScreenNetSelectMusic" then
-                    self:visible(false)
-                end
-            end,
-            DisplayCommand = function(self)
-                if hasReplayData then
-                    self:settext(translated_info["ShowEval"])
-                else
-                    self:settext("")
-                end
-            end,
-            HighlightCommand = function(self)
-                highlightIfOver(self)
-            end,
-            MouseLeftClickMessageCommand = function(self)
-                if nestedTab == 1 then
-                    if getTabIndex() == 2 and getScoreForPlot() and hasReplayData and isOver(self) then
-                        SCREENMAN:GetTopScreen():ShowEvalScreenForScore(score)
-                    end
-                end
-            end
-        },
-    }
+		Def.Quad {
+			Name = "EvalViewQuad",
+			InitCommand = function(self)
+				self:xy((frameWidth - offsetX - frameX) / 2.1, frameHeight - headeroffY - 17 - offsetY):diffuse(0,0,0,0)
+				self:zoomtowidth(145):zoomtoheight(21)
+			end,
+			DisplayCommand = function(self)
+				if hasReplayData then
+					self:diffusealpha(0.3)
+				else
+					self:diffusealpha(0)
+				end
+			end,
+			HighlightCommand = function(self)
+				if isOver(self) then
+					self:GetParent():GetChild("EvalViewer"):diffusealpha(0.6)
+				else
+					self:GetParent():GetChild("EvalViewer"):diffusealpha(1)
+				end
+			end,
+			MouseLeftClickMessageCommand = function(self)
+				if nestedTab == 1 then
+					if getTabIndex() == 2 and getScoreForPlot() and hasReplayData and isOver(self) then
+						SCREENMAN:GetTopScreen():ShowEvalScreenForScore(score)
+					end
+				end
+			end,
+		},
+		LoadFont("Common Large") ..
+		{
+			Name = "EvalViewer",
+			InitCommand = function(self)
+				self:xy((frameWidth - offsetX - frameX) / 2.1, frameHeight - headeroffY - 18 - offsetY):zoom(0.35):settext("")
+				self:diffuse(getMainColor("positive"))
+			end,
+			BeginCommand = function(self)
+				if SCREENMAN:GetTopScreen():GetName() == "ScreenNetSelectMusic" then
+					self:visible(false)
+				end
+			end,
+			DisplayCommand = function(self)
+				if hasReplayData then
+					self:settext(translated_info["ShowEval"])
+				else
+					self:settext("")
+				end
+			end,
+		},
+	}
 
 l[#l + 1] =
 	LoadFont("Common Normal") ..
 	{
 		Name = "TheDootButton",
 		InitCommand = function(self)
-			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 38 - offsetY):zoom(0.45):halign(1):settext("")
+			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 35 - offsetY):zoom(0.55):halign(1):settext("")
+			self:diffuse(getMainColor("positive"))
 		end,
 		DisplayCommand = function(self)
 			if hasReplayData then
@@ -765,7 +787,8 @@ l[#l + 1] =
 	{
 		Name = "TheDootButtonTWO",
 		InitCommand = function(self)
-			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 57 - offsetY):zoom(0.45):halign(1):settext("")
+			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 49 - offsetY):zoom(0.45):halign(1):settext("")
+			self:diffuse(getMainColor("positive"))
 		end,
 		DisplayCommand = function(self)
 			self:settext("Upload all scores for this chart")
@@ -786,7 +809,8 @@ l[#l + 1] =
 	{
 		Name = "TheDootButtonTHREEEEEEEE",
 		InitCommand = function(self)
-			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 71 - offsetY):zoom(0.45):halign(1):settext("")
+			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 63 - offsetY):zoom(0.45):halign(1):settext("")
+			self:diffuse(getMainColor("positive"))
 		end,
 		DisplayCommand = function(self)
 			self:settext("Upload all scores for charts in this pack")
@@ -807,7 +831,8 @@ l[#l + 1] =
 	{
 		Name = "TheDootButtonFOUR",
 		InitCommand = function(self)
-			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 85 - offsetY):zoom(0.45):halign(1):settext("")
+			self:xy(frameWidth - offsetX - frameX, frameHeight - headeroffY - 77 - offsetY):zoom(0.45):halign(1):settext("")
+			self:diffuse(getMainColor("positive"))
 		end,
 		DisplayCommand = function(self)
 			self:settext("MOVE EVERY ZIG")

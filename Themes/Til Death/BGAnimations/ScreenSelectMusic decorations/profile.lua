@@ -73,6 +73,7 @@ local scoreYspacing = 10
 local distY = 15
 local offsetX = -10
 local offsetY = 20
+local txtDist = 27 * 1.2
 local rankingSkillset = 1
 local rankingPage = 1
 local numrankingpages = 10
@@ -813,7 +814,7 @@ local function littlebits(i)
 	local t =
 		Def.ActorFrame {
 		InitCommand = function(self)
-			self:xy(frameX + 30, frameY + 50)
+			self:xy(frameX + 45, frameY - 20)
 		end,
 		UpdateRankingMessageCommand = function(self)
 			if rankingSkillset == 1 and update and not recentactive then
@@ -825,7 +826,7 @@ local function littlebits(i)
 		LoadFont("Common Large") ..
 			{
 				InitCommand = function(self)
-					self:y(22 * i):maxwidth(170 * 2):halign(0):zoom(0.5):diffuse(getMainColor("positive"))
+					self:y(txtDist * i):maxwidth(170 * 2):halign(0):zoom(0.6)
 				end,
 				SetCommand = function(self)
 					self:settext(ms.SkillSetsTranslated[i] .. ":")
@@ -834,16 +835,16 @@ local function littlebits(i)
 		LoadFont("Common Large") ..
 			{
 				InitCommand = function(self)
-					self:xy(170, 22 * i):halign(0):zoom(0.5)
+					self:xy(210, txtDist * i):halign(0):zoom(0.6)
 				end,
 				SetCommand = function(self)
 					local rating = 0
 					if not showOnline then
 						rating = profile:GetPlayerSkillsetRating(ms.SkillSets[i])
-						self:settextf("%5.2f", rating)
+						self:settextf("%05.2f", rating)
 					else
 						rating = DLMAN:GetSkillsetRating(ms.SkillSets[i])
-						self:settextf("%5.2f(#%i)", rating, DLMAN:GetSkillsetRank(ms.SkillSets[i]))
+						self:settextf("%05.2f(#%i)", rating, DLMAN:GetSkillsetRank(ms.SkillSets[i]))
 					end
 					self:diffuse(byMSD(rating))
 				end,
@@ -862,102 +863,111 @@ for i = 2, #ms.SkillSets do
 	r[#r + 1] = littlebits(i)
 end
 
+-- should maybe make some of these generic
+local function highlight(self)
+	if self:IsVisible() then
+		self:queuecommand("Highlight")
+	end
+end
+
+-- note: will use the local isover functionality
+local function highlightIfOver(self)
+	if isOver(self) then
+		self:diffusealpha(0.6)
+	else
+		self:diffusealpha(1)
+	end
+end
 local user
 local pass
 local profilebuttons =
 	Def.ActorFrame {
-	InitCommand = function(self)
-		self:xy(frameX + 45, frameHeight + 20)
-		user = playerConfig:get_data(pn_to_profile_slot(PLAYER_1)).UserName
-		local passToken = playerConfig:get_data(pn_to_profile_slot(PLAYER_1)).PasswordToken
-		if passToken ~= "" and answer ~= "" then
-			if not DLMAN:IsLoggedIn() then
-				DLMAN:LoginWithToken(user, passToken)
+		InitCommand = function(self)
+			self:xy(frameX + 45, frameHeight + 20)
+			user = playerConfig:get_data(pn_to_profile_slot(PLAYER_1)).UserName
+			local passToken = playerConfig:get_data(pn_to_profile_slot(PLAYER_1)).PasswordToken
+			if passToken ~= "" and answer ~= "" then
+				if not DLMAN:IsLoggedIn() then
+					DLMAN:LoginWithToken(user, passToken)
+				end
+			else
+				passToken = ""
+				user = ""
 			end
-		else
-			passToken = ""
-			user = ""
-		end
-	end,
-	UpdateRankingMessageCommand = function(self)
-		if rankingSkillset == 1 and update and not recentactive then
-			self:visible(true)
-		else
-			self:visible(false)
-		end
-	end,
-	LoadFont("Common Large") ..
+			self:SetUpdateFunction(highlight)
+			self:SetUpdateFunctionInterval(0.025)
+		end,
+		UpdateRankingMessageCommand = function(self)
+			if rankingSkillset == 1 and update and not recentactive then
+				self:visible(true)
+			else
+				self:visible(false)
+			end
+		end,
+		LoadFont("Common Large") ..
 		{
 			InitCommand = function(self)
 				self:diffuse(getMainColor("positive")):settext(translated_info["Save"]):zoom(0.3)
-			end
-		},
-	Def.Quad {
-		InitCommand = function(self)
-			self:zoomto(100, 20):diffusealpha(buttondiffuse)
-		end,
-		MouseLeftClickMessageCommand = function(self)
-			if ButtonActive(self) and rankingSkillset == 1 and not recentactive then
-				if PROFILEMAN:SaveProfile(PLAYER_1) then
-					ms.ok(translated_info["Success"])
-					STATSMAN:UpdatePlayerRating()
-				else
-					ms.ok(translated_info["Failure"])
+			end,
+			HighlightCommand = function(self)
+				highlightIfOver(self)
+			end,
+			MouseLeftClickMessageCommand = function(self)
+				if ButtonActive(self) and rankingSkillset == 1 and not recentactive then
+					if PROFILEMAN:SaveProfile(PLAYER_1) then
+						ms.ok(translated_info["Success"])
+						STATSMAN:UpdatePlayerRating()
+					else
+						ms.ok(translated_info["Failure"])
+					end
 				end
 			end
-		end
-	},
-	LoadFont("Common Large") ..
+		},
+		LoadFont("Common Large") ..
 		{
 			InitCommand = function(self)
 				self:x(100):diffuse(getMainColor("positive")):settext(translated_info["AssetSettings"]):zoom(0.3)
-			end
+			end,
+			HighlightCommand = function(self)
+				highlightIfOver(self)
+			end,
+			MouseLeftClickMessageCommand = function(self)
+				if ButtonActive(self) and rankingSkillset == 1 and not recentactive then
+					SCREENMAN:SetNewScreen("ScreenAssetSettings")
+				end
+			end,
 		},
-	Def.Quad {
-		InitCommand = function(self)
-			self:x(100):zoomto(100, 20):diffusealpha(buttondiffuse)
-		end,
-		MouseLeftClickMessageCommand = function(self)
-			if ButtonActive(self) and rankingSkillset == 1 and not recentactive then
-				SCREENMAN:SetNewScreen("ScreenAssetSettings")
-			end
-		end
-	},
-	LoadFont("Common Large") ..
+		LoadFont("Common Large") ..
 		{
 			InitCommand = function(self)
 				self:x(200):diffuse(getMainColor("positive")):settext(translated_info["ValidateAll"]):zoom(0.3)
-			end
+			end,
+			HighlightCommand = function(self)
+				highlightIfOver(self)
+			end,
+			MouseLeftClickMessageCommand = function(self)
+				if ButtonActive(self) and rankingSkillset == 1 and not recentactive then
+					profile:UnInvalidateAllScores()
+					STATSMAN:UpdatePlayerRating()
+				end
+			end,
 		},
-	Def.Quad {
-		InitCommand = function(self)
-			self:x(200):zoomto(100, 20):diffusealpha(buttondiffuse)
-		end,
-		MouseLeftClickMessageCommand = function(self)
-			if ButtonActive(self) and rankingSkillset == 1 and not recentactive then
-				profile:UnInvalidateAllScores()
-				STATSMAN:UpdatePlayerRating()
-			end
-		end
-	},
-	LoadFont("Common Large") ..
-	{
-		InitCommand = function(self)
-			self:x(300):diffuse(getMainColor("positive")):settext(translated_info["ForceRecalc"]):zoom(0.3)
-		end
-	},
-	Def.Quad {
-	InitCommand = function(self)
-		self:x(300):zoomto(100, 20):diffusealpha(buttondiffuse)
-	end,
-	MouseLeftClickMessageCommand = function(self)
-		if ButtonActive(self) and rankingSkillset == 1 and not recentactive  then
-			ms.ok("Recalculating Scores... this might be slow and may or may not crash")
-			profile:ForceRecalcScores()
-		end
-	end
-}
-}
+		LoadFont("Common Large") ..
+		{
+			InitCommand = function(self)
+				self:x(300):diffuse(getMainColor("positive")):settext(translated_info["ForceRecalc"]):zoom(0.3)
+			end,
+			HighlightCommand = function(self)
+				highlightIfOver(self)
+			end,
+			MouseLeftClickMessageCommand = function(self)
+				if ButtonActive(self) and rankingSkillset == 1 and not recentactive  then
+					ms.ok("Recalculating Scores... this might be slow and may or may not crash")
+					profile:ForceRecalcScores()
+				end
+			end,
+		},
+	}
 
 t[#t + 1] = profilebuttons
 t[#t + 1] = r

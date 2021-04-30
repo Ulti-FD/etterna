@@ -8,7 +8,7 @@ local frameWidth = SCREEN_WIDTH * 0.56
 local frameHeight = 368
 local fontScale = 0.4
 local distY = 15
-local offsetX = 9
+local offsetX = 10
 local offsetY = 20
 local pn = GAMESTATE:GetEnabledPlayers()[1]
 local greatest = 0
@@ -110,8 +110,6 @@ local function littlebits(i)
 					--highlight
 					if greatest == i then
 						self:diffuse(getMainColor("positive"))
-					else
-						self:diffuse(getMainColor("negative"))
 					end
 					--If negative BPM empty label
 					if steps and steps:GetTimingData():HasWarps() then
