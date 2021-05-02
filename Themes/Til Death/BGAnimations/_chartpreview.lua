@@ -132,7 +132,7 @@ local t = Def.ActorFrame {
 	Def.Quad {
 		Name = "BG",
 		InitCommand = function(self)
-			self:xy(wodth/2, SCREEN_HEIGHT/2) 
+			self:xy(wodth/2, SCREEN_HEIGHT/2)
 			self:diffuse(color("0.05,0.05,0.05,1"))
 		end,
 		CurrentStyleChangedMessageCommand=function(self)
@@ -140,11 +140,11 @@ local t = Def.ActorFrame {
 			self:zoomto(48 * cols, SCREEN_HEIGHT)
 		end
 	},
-	LoadFont("Common Normal") .. {
+	LoadFont("Common Large") .. {
 		Name = "pausetext",
 		InitCommand = function(self)
-			self:xy(wodth/2, SCREEN_HEIGHT/2)
-			self:settext(""):diffuse(color("0.8,0,0"))
+			self:xy(wodth/2, SCREEN_HEIGHT/2):draworder(900):zoom(0.5)
+			self:settext(""):diffuse(0.8,0,0,1):shadowlength(1)
 		end,
 		NoteFieldVisibleMessageCommand = function(self)
 			self:settext("")
@@ -153,9 +153,9 @@ local t = Def.ActorFrame {
 			self:playcommand("Set")
 		end,
 		SetCommand = function(self)
-			if SCREENMAN:GetTopScreen():IsSampleMusicPaused() then 
+			if SCREENMAN:GetTopScreen():IsSampleMusicPaused() then
 				self:settext(translated_info["Paused"])
-			else 
+			else
 				self:settext("")
 			end
 		end
@@ -166,7 +166,7 @@ local t = Def.ActorFrame {
 			--self:zoomto(wodth, hidth):halign(0):diffuse(color(".1,.1,.1,1")):draworder(900) -- alt bg for calc info
 			self:zoomto(wodth, hidth):halign(0):diffuse(color("1,1,1,1")):draworder(900) -- cdgraph bg
 		end,
-		HighlightCommand = function(self)	-- use the bg for detection but move the seek pointer -mina 
+		HighlightCommand = function(self)	-- use the bg for detection but move the seek pointer -mina
 			if isOver(self) then
 				self:GetParent():GetChild("Seek"):visible(true)
 				self:GetParent():GetChild("Seektext"):visible(true)
