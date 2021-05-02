@@ -64,7 +64,7 @@ local t =
 				cd:queuecommand("GraphUpdate")
 			else
 				cd:visible(false)
-			end	
+			end
 			update = true
 		else
 			self:queuecommand("Off")
@@ -109,7 +109,8 @@ local function littlebits(i)
 					end
 					--highlight
 					if greatest == i then
-						self:diffuse(getMainColor("positive"))
+						self:diffusetopedge(getMainColor("highlight"))
+						self:diffusebottomedge(getMainColor("positive"))
 					end
 					--If negative BPM empty label
 					if steps and steps:GetTimingData():HasWarps() then
