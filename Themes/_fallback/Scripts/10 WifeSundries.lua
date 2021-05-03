@@ -71,8 +71,8 @@ ms.SkillSetsShort = {
 	"JS",
 	"HS",
 	"Stam",
-	"Jack Speed",
-	"Chordjack",
+	"Jacks",
+	"CJ",
 	"Tech"
 }
 
@@ -96,6 +96,17 @@ ms.SkillSetsTranslated = {
 	THEME:GetString("Skillsets", "JackSpeed"),
 	THEME:GetString("Skillsets", "Chordjack"),
 	THEME:GetString("Skillsets", "Technical"),
+}
+
+ms.SkillSetsShortTranslated = {
+	THEME:GetString("Skillsets", "OverallShort"),
+	THEME:GetString("Skillsets", "StreamShort"),
+	THEME:GetString("Skillsets", "JumpstreamShort"),
+	THEME:GetString("Skillsets", "HandstreamShort"),
+	THEME:GetString("Skillsets", "StaminaShort"),
+	THEME:GetString("Skillsets", "JackSpeedShort"),
+	THEME:GetString("Skillsets", "ChordjackShort"),
+	THEME:GetString("Skillsets", "TechnicalShort"),
 }
 
 ms.JudgeScalers = GAMESTATE:GetTimingScales()
