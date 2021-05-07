@@ -645,7 +645,7 @@ l[#l + 1] =
 	{
 		Name = "Score",
 		InitCommand = function(self)
-			self:y(frameHeight - headeroffY - 30 - offsetY):zoom(0.55):halign(0):settext("")
+			self:y(frameHeight - headeroffY - 31 - offsetY):zoom(0.55):halign(0):settext("")
 			self:diffuse(getMainColor("positive"))
 		end,
 		DisplayCommand = function(self)
@@ -705,6 +705,11 @@ l[#l + 1] =
 	}
 l[#l + 1] =
 	Def.ActorFrame {
+		InitCommand = function(self)
+			if not IsUsingWideScreen() then
+				self:x(6):y(37):zoom(0.9)
+			end
+		end,
 		Def.Quad {
 			Name = "EvalViewQuad",
 			InitCommand = function(self)

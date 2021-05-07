@@ -466,7 +466,7 @@ local function recentLabel(i)
 				self:maxwidth(100)
 			end,
 			DisplayProfileRankingLabelsMessageCommand = function(self)
-				if ths then
+				if ths and IsUsingWideScreen() then
 					self:halign(0.5)
 					self:settext(((rankingPage - 1) * 25) + i .. ".")
 					self:diffuse(byValidity(ths:GetEtternaValid()))
@@ -572,11 +572,15 @@ local function recentLabel(i)
 			Name = "rectext7",
 			--date
 			InitCommand = function(self)
-				self:x(310):zoom(fontScale + 0.05):halign(0)
+				self:x(312):zoom(fontScale + 0.05):halign(0)
 			end,
 			DisplayProfileRankingLabelsMessageCommand = function(self)
 				if ths then
-					self:settext(ths:GetDate())
+					if not IsUsingWideScreen() then
+						self:settext(ths:GetDate():sub(1,10)):x(318)
+					else
+						self:settext(ths:GetDate())
+					end
 				else
 					self:settext("")
 				end
