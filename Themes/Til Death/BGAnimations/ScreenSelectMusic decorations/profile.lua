@@ -378,10 +378,10 @@ local function rankingLabel(i)
 end
 
 local function rankingButton(i)
-	local t =
-		Def.ActorFrame {
+	local t = Def.ActorFrame {
 		InitCommand = function(self)
 			self:xy(rankingX + (i - 1) * rankingTitleSpacing, rankingY * 1.15)
+			self:SetUpdateFunction(highlight):SetUpdateFunctionInterval(0.025)
 		end,
 		Def.Quad {
 			InitCommand = function(self)
@@ -405,10 +405,16 @@ local function rankingButton(i)
 			end,
 			UpdateRankingMessageCommand = function(self)
 				self:queuecommand("Set")
-			end
+			end,
+			HighlightCommand = function(self)
+				local alph = 1
+				if isOver(self) then alph = .8 end
+				self:GetParent():GetChild("RankButtonTxt"):diffusealpha(alph)
+			end,
 		},
 		LoadFont("Common Large") ..
 		{
+			Name = "RankButtonTxt",
 			InitCommand = function(self)
 				self:addy(-1):diffuse(getMainColor("positive")):maxwidth(rankingTitleSpacing*2):zoom(0.42)
 			end,
@@ -561,6 +567,21 @@ local function recentLabel(i)
 					end
 			end
 		},
+		LoadFont("Common Normal") ..
+		{
+			Name = "rectext7",
+			--date
+			InitCommand = function(self)
+				self:x(310):zoom(fontScale + 0.05):halign(0)
+			end,
+			DisplayProfileRankingLabelsMessageCommand = function(self)
+				if ths then
+					self:settext(ths:GetDate())
+				else
+					self:settext("")
+				end
+			end,
+		},
 		Def.Quad {
 			InitCommand = function(self)
 				self:x(-7):halign(0):zoom(fontScale):diffusealpha(buttondiffuse)
@@ -592,22 +613,8 @@ local function recentLabel(i)
 			HighlightCommand = function(self)
 				local alph = 1
 				if isOver(self) then alph = .7 end
-				for i = 1,5 do
+				for i = 1,7 do
 					self:GetParent():GetChild("rectext" .. i):diffusealpha(alph)
-				end
-			end,
-		},
-		LoadFont("Common Normal") ..
-		{
-			--date
-			InitCommand = function(self)
-				self:x(310):zoom(fontScale + 0.05):halign(0)
-			end,
-			DisplayProfileRankingLabelsMessageCommand = function(self)
-				if ths then
-					self:settext(ths:GetDate())
-				else
-					self:settext("")
 				end
 			end,
 		},
@@ -620,6 +627,7 @@ local function recentButton()
 		Def.ActorFrame {
 		InitCommand = function(self)
 			self:xy(rankingX + (3.5) * rankingTitleSpacing, 24 * 0.75):valign(1)
+			self:SetUpdateFunction(highlight):SetUpdateFunctionInterval(0.025)
 		end,
 		Def.Quad {
 			InitCommand = function(self)
@@ -642,10 +650,16 @@ local function recentButton()
 			end,
 			UpdateRankingMessageCommand = function(self)
 				self:queuecommand("Set")
-			end
+			end,
+			HighlightCommand = function(self)
+				local alph = 1
+				if isOver(self) then alph = .8 end
+				self:GetParent():GetChild("RecentButtonTxt"):diffusealpha(alph)
+			end,
 		},
 		LoadFont("Common Large") ..
 		{
+			Name = "RecentButtonTxt",
 			InitCommand = function(self)
 				self:addy(-1):diffuse(getMainColor("positive")):maxwidth(rankingTitleSpacing * 2):zoom(0.42)
 			end,
@@ -782,7 +796,7 @@ r[#r + 1] = Def.ActorFrame {
 	end,
 	Def.Quad {
 		InitCommand = function(self)
-			self:xy(296.25, -8):zoomto(40, 20):halign(0):valign(0):diffuse(getMainColor("frames")):diffusealpha(0.1)
+			self:xy(296.25, -8.5):zoomto(40, 20):halign(0):valign(0):diffuse(getMainColor("frames")):diffusealpha(0.2)
 		end,
 		MouseLeftClickMessageCommand = function(self)
 			if isOver(self) then
@@ -796,7 +810,7 @@ r[#r + 1] = Def.ActorFrame {
 		end,
 		HighlightCommand = function(self)
 				local alph = 1
-				if isOver(self) then alph = .7 end
+				if isOver(self) then alph = .75 end
 				self:GetParent():GetChild("NextP"):diffusealpha(alph)
 		end,
 	},
@@ -809,7 +823,7 @@ r[#r + 1] = Def.ActorFrame {
 	},
 	Def.Quad {
 		InitCommand = function(self)
-			self:xy(-2,-8):zoomto(65, 20):halign(0):valign(0):diffuse(getMainColor("frames")):diffusealpha(0.1)
+			self:xy(-2,-8.5):zoomto(65, 20):halign(0):valign(0):diffuse(getMainColor("frames")):diffusealpha(0.2)
 		end,
 		MouseLeftClickMessageCommand = function(self)
 			if isOver(self) then
@@ -823,7 +837,7 @@ r[#r + 1] = Def.ActorFrame {
 		end,
 		HighlightCommand = function(self)
 				local alph = 1
-				if isOver(self) then alph = .7 end
+				if isOver(self) then alph = .75 end
 				self:GetParent():GetChild("PrevP"):diffusealpha(alph)
 		end,
 	},
