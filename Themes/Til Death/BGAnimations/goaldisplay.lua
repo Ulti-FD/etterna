@@ -10,13 +10,13 @@ local width = SCREEN_WIDTH * 0.56
 local dwidth = width - offx * 2
 local height = (numgoals + 2) * packspaceY
 
-local adjx = 14
-local c0x = 10
-local c1x = 10 + c0x
-local c2x = c1x + (tzoom * 7 * adjx) -- guesswork adjustment for epxected text length
-local c5x = dwidth -- right aligned cols
-local c4x = c5x - adjx - (tzoom * 3 * adjx) -- right aligned cols
-local c3x = c4x - adjx - (tzoom * 10 * adjx) -- right aligned cols
+local adjx = 10
+local c0x = 20 -- for: priority and delete button
+local c1x = c0x + 25 -- for: rate header, rate and percent
+local c2x = c1x + (tzoom * 4 * adjx) -- for: song header and song name
+local c5x = dwidth -- for: diff header, msd and steps diff
+local c4x = c5x - adjx - (tzoom * 3.5 * adjx) -- for: date header, assigned, achieved
+local c3x = c4x - adjx - (tzoom * 10 * adjx) -- for: filter header and song name
 local headeroff = packspaceY / 1.5
 
 local moving
@@ -136,28 +136,18 @@ local o =
 	},
 	LoadFont("Common normal") ..
 		{
-			--index
+			--priority header
 			InitCommand = function(self)
-				self:xy(width / 2, headeroff):zoom(tzoom):halign(0.5)
-			end,
-			UpdateCommand = function(self)
-				self:settextf("%i-%i", ind + 1, ind + numgoals)
-			end
-		},
-	LoadFont("Common normal") ..
-		{
-			--priority
-			InitCommand = function(self)
-				self:xy(c0x + 10, headeroff):zoom(tzoom):halign(0.5)
+				self:xy(c0x, headeroff):zoom(tzoom):halign(0.5)
 			end,
 			UpdateCommand = function(self)
 				self:settext(translated_info["PriorityShort"])
 			end,
 			HighlightCommand = function(self)
 				if isOver(self) then
-					self:settext(translated_info["PriorityLong"]):diffusealpha(0.6)
+					self:settext(translated_info["PriorityLong"]):diffusealpha(0.6):halign(0.45):zoomx(0.7 * tzoom)
 				else
-					self:settext(translated_info["PriorityShort"]):diffusealpha(1)
+					self:settext(translated_info["PriorityShort"]):diffusealpha(1):halign(0.5):zoomx(tzoom)
 				end
 			end,
 			MouseLeftClickMessageCommand = function(self)
@@ -170,9 +160,9 @@ local o =
 		},
 	LoadFont("Common normal") ..
 		{
-			--rate
+			--rate header
 			InitCommand = function(self)
-				self:xy(c1x + 25, headeroff):zoom(tzoom):halign(0.5)
+				self:xy(c1x, headeroff):zoom(tzoom):halign(0.5)
 			end,
 			UpdateCommand = function(self)
 				self:settext(translated_info["RateShort"])
@@ -194,7 +184,7 @@ local o =
 		},
 	LoadFont("Common normal") ..
 		{
-			--name
+			--song header
 			InitCommand = function(self)
 				self:xy(c2x, headeroff):zoom(tzoom):halign(0):settext(translated_info["Song"])
 			end,
@@ -211,9 +201,19 @@ local o =
 		},
 	LoadFont("Common normal") ..
 		{
-			--completed toggle // filters
+			--index header
 			InitCommand = function(self)
-				self:xy(c3x - capWideScale(15, 40), headeroff):zoom(tzoom):halign(0):settext(filts[1])
+				self:xy(width / 2, headeroff):zoom(tzoom):halign(0.5)
+			end,
+			UpdateCommand = function(self)
+				self:settextf("%i-%i", ind + 1, ind + numgoals)
+			end
+		},
+	LoadFont("Common normal") ..
+		{
+			--completed toggle // filter header
+			InitCommand = function(self)
+				self:xy(width/2 + capWideScale(40, 50), headeroff):zoom(tzoom):halign(0):settext(filts[1])
 			end,
 			HighlightCommand = function(self)
 				highlightIfOver(self)
@@ -229,9 +229,9 @@ local o =
 		},
 	LoadFont("Common normal") ..
 		{
-			--date
+			--date header
 			InitCommand = function(self)
-				self:xy(c4x - 5, headeroff):zoom(tzoom):halign(1):settext(translated_info["Date"])
+				self:xy(c4x - capWideScale(5, 35), headeroff):zoom(tzoom):halign(1):settext(translated_info["Date"])
 			end,
 			HighlightCommand = function(self)
 				highlightIfOver(self)
@@ -246,7 +246,7 @@ local o =
 		},
 	LoadFont("Common normal") ..
 		{
-			--diff
+			--diff header
 			InitCommand = function(self)
 				self:xy(c5x, headeroff):zoom(tzoom):halign(1):settext(translated_info["Difficulty"])
 			end,
@@ -298,7 +298,7 @@ local function makeGoalDisplay(i)
 			{
 				--priority
 				InitCommand = function(self)
-					self:x(c0x):zoom(tzoom):halign(-0.5):valign(1)
+					self:x(c0x):zoom(tzoom):halign(0.5):valign(1)
 				end,
 				DisplayCommand = function(self)
 					self:settext(sg:GetPriority())
@@ -319,28 +319,28 @@ local function makeGoalDisplay(i)
 					end
 				end
 			},
-		LoadFont("Common normal") ..
-			{
-				--steps diff
-				InitCommand = function(self)
-					self:x(c0x):zoom(tzoom):halign(0):valign(0)
-				end,
-				DisplayCommand = function(self)
-					if goalsteps and goalsong then
-						local diff = goalsteps:GetDifficulty()
-						self:settext(getShortDifficulty(diff))
-						self:diffuse(byDifficulty(diff))
-					else
-						self:settext("??")
-						self:diffuse(getMainColor("negative"))
-					end
+		Def.Sprite {
+			-- delete button
+			Texture = THEME:GetPathG("","goalX.png"),
+			InitCommand = function(self)
+				self:xy(c0x - 13,pdh/2.3):zoom(0.3):halign(0):valign(1):diffuse(byJudgment("TapNoteScore_Miss"))
+			end,
+			HighlightCommand = function(self)
+				highlightIfOver(self)
+			end,
+			MouseLeftClickMessageCommand = function(self)
+				if isOver(self) then
+					sg:Delete()
+					GetPlayerOrMachineProfile(PLAYER_1):SetFromAll()
+					self:GetParent():GetParent():queuecommand("GoalTableRefresh")
 				end
-			},
+			end
+		},
 		LoadFont("Common normal") ..
 			{
 				--rate
 				InitCommand = function(self)
-					self:x(c1x):zoom(tzoom):halign(-0.5):valign(1)
+					self:x(c1x):zoom(tzoom):halign(0.5):valign(1)
 				end,
 				DisplayCommand = function(self)
 					local ratestring = string.format("%.2f", sg:GetRate()):gsub("%.?0$", "") .. "x"
@@ -366,7 +366,7 @@ local function makeGoalDisplay(i)
 			{
 				--percent
 				InitCommand = function(self)
-					self:x(c1x):zoom(tzoom):halign(-0.5):valign(0):maxwidth((50 - capWideScale(10, 10)) / tzoom)
+					self:x(c1x):zoom(tzoom):halign(0.5):valign(0):maxwidth((50 - capWideScale(10, 10)) / tzoom)
 				end,
 				DisplayCommand = function(self)
 					local perc = notShit.round(sg:GetPercent() * 100000) / 1000
@@ -377,7 +377,7 @@ local function makeGoalDisplay(i)
 					else
 						self:settextf("%.3f%%", perc)
 					end
-					self:diffuse(byAchieved(sg)):x(c1x + (2 * adjx) - self:GetZoomedWidth()) -- def doing this alignment wrong
+					self:diffuse(byAchieved(sg))
 				end,
 				HighlightCommand = function(self)
 					highlightIfOver(self)
@@ -397,9 +397,9 @@ local function makeGoalDisplay(i)
 			},
 		LoadFont("Common normal") ..
 			{
-				--name
+				--song name
 				InitCommand = function(self)
-					self:x(c2x):zoom(tzoom):maxwidth((c3x - c2x - capWideScale(10, 40)) / tzoom):halign(0):valign(1)
+					self:x(c2x):zoom(tzoom):maxwidth((c3x - c2x - capWideScale(32, 62)) / tzoom):halign(0):valign(1)
 				end,
 				DisplayCommand = function(self)
 					if goalsong then
@@ -475,7 +475,7 @@ local function makeGoalDisplay(i)
 			},
 		LoadFont("Common normal") ..
 			{
-				--diff
+				--msd diff
 				InitCommand = function(self)
 					self:x(c5x):zoom(tzoom):halign(1):valign(1)
 				end,
@@ -488,28 +488,23 @@ local function makeGoalDisplay(i)
 					end
 				end
 			},
-		Def.Quad {
-			-- delete button
-			InitCommand = function(self)
-				self:x(c5x):zoom(tzoom):halign(1):valign(-1):zoomto(4, 4):diffuse(byJudgment("TapNoteScore_Miss"))
-			end,
-			MouseLeftClickMessageCommand = function(self)
-				if sg and isOver(self) and update and sg then
-					sg:Delete()
-					MESSAGEMAN:Broadcast("UpdateGoals")
+		LoadFont("Common normal") ..
+			{
+				--steps diff
+				InitCommand = function(self)
+					self:x(c5x):zoom(tzoom):halign(1):valign(0)
+				end,
+				DisplayCommand = function(self)
+					if goalsteps and goalsong then
+						local diff = goalsteps:GetDifficulty()
+						self:settext(getShortDifficulty(diff))
+						self:diffuse(byDifficulty(diff))
+					else
+						self:settext("??")
+						self:diffuse(getMainColor("negative"))
+					end
 				end
-			end,
-			HighlightCommand = function(self)
-				highlightIfOver(self)
-			end,
-			MouseLeftClickMessageCommand = function(self)
-				if isOver(self) then
-					sg:Delete()
-					GetPlayerOrMachineProfile(PLAYER_1):SetFromAll()
-					self:GetParent():GetParent():queuecommand("GoalTableRefresh")
-				end
-			end
-		}
+			},
 	}
 	return o
 end
