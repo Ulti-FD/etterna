@@ -90,22 +90,12 @@ local t = Def.ActorFrame {
 		cd:GetChild("cdbg"):diffusealpha(0)	-- we want to use our position background for draw order stuff -mina
 		cd:queuecommand("GraphUpdate")		-- first graph will be empty if we dont force this on initial creation
 	end,
-	OptionsScreenClosedMessageCommand = function(self)
-		local rev = GAMESTATE:GetPlayerState():GetCurrentPlayerOptions():UsingReverse()
-		if self:GetChild("NoteField") ~= nil then
-			if not rev then
-				self:GetChild("NoteField"):y(yPos * 1.5)
-			else
-				self:GetChild("NoteField"):y(yPos * 1.5 + yPosReverse)
-			end
-		end
-	end,
 
 	Def.NoteFieldPreview {
 		Name = "NoteField",
-		DrawDistanceBeforeTargetsPixels = 800,
+		DrawDistanceBeforeTargetsPixels = 600,
 		DrawDistanceAfterTargetsPixels = 0,
-		YReverseOffsetPixels = 100,
+		--YReverseOffsetPixels = 100,
 
 		BeginCommand = function(self)
 			self:zoom(prevZoom):draworder(90)
