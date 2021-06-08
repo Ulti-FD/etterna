@@ -244,7 +244,7 @@ local t = Def.ActorFrame {
 					elseif curLevel == 2 then
 						cursorIndex[curLevel] = math.max(1, cursorIndex[curLevel] - 1)
 					end
-		
+
 					MESSAGEMAN:Broadcast("RowChanged", {level = curLevel})
 				elseif event.button == "MenuDown" then
 					if curLevel == 1 then
@@ -254,7 +254,7 @@ local t = Def.ActorFrame {
 					elseif curLevel == 2 then
 						cursorIndex[curLevel] = math.min(getTableSize(configData[selected[1]]), cursorIndex[curLevel] + 1)
 					end
-		
+
 					MESSAGEMAN:Broadcast("RowChanged", {level = curLevel})
 				elseif event.button == "MenuLeft" then
 					curLevel = math.max(1, curLevel - 1)

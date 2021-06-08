@@ -7,6 +7,7 @@ local defaultConfig = {
 	},
 	main = {
 		highlight = "#614080",
+		highlight2 = "#824FBE",
 		frames = "#000111",
 		enabled = "#4CBB17",
 		disabled = "#666666",

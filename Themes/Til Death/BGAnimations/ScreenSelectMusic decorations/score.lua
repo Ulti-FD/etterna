@@ -875,6 +875,7 @@ function nestedTabButton(i)
 	return Def.ActorFrame {
 		InitCommand = function(self)
 			self:xy(frameX + offsetX/2 + (i - 1) * (nestedTabButtonWidth - capWideScale(100, 80)), frameY + offsetY - 4)
+			self:SetUpdateFunction(highlight)
 			self:SetUpdateFunctionInterval(0.025)
 		end,
 		CollapseCommand = function(self)
@@ -892,7 +893,7 @@ function nestedTabButton(i)
 				end,
 				HighlightCommand = function(self)
 					if isOver(self) and nestedTab ~= i then
-						self:diffusealpha(0.75)
+						self:diffusealpha(0.8)
 					elseif nestedTab == i then
 						self:diffusealpha(1)
 					else
