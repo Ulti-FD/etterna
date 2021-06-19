@@ -88,7 +88,7 @@ function tabs(index)
 		Def.Quad {
 		Name = "TabBG",
 		InitCommand = function(self)
-			self:y(2):valign(0):zoomto(frameWidth, 20):diffusecolor(getMainColor("frames")):diffusealpha(0.85)
+			self:y(2):valign(0):zoomto(frameWidth, 14):diffusecolor(getMainColor("frames")):diffusealpha(0.85)
 		end,
 		MouseLeftClickMessageCommand = function(self)
 			if isOver(self) then
@@ -103,7 +103,7 @@ function tabs(index)
 		LoadFont("Common Normal") ..
 		{
 			InitCommand = function(self)
-				self:y(5):valign(0):zoom(0.4):diffuse(getMainColor("positive")):maxwidth(frameWidth * 2)
+				self:y(4):valign(0):zoom(0.4):diffuse(getMainColor("positive")):maxwidth(frameWidth * 2)
 			end,
 			BeginCommand = function(self)
 				self:queuecommand("Set")
