@@ -5,6 +5,8 @@ local active = false
 local whee
 local lastsearchstring = ""
 local instantSearch = themeConfig:get_data().global.InstantSearch
+local IgnoreTabInput = themeConfig:get_data().global.IgnoreTabInput
+
 
 local function searchInput(event)
 	if event.type ~= "InputEventType_Release" and active == true then
@@ -36,7 +38,7 @@ local function searchInput(event)
 			elseif
 			--if not nil and (not a number or (ctrl pressed and not online))
 				event.char and event.char:match('[%%%+%-%!%@%#%$%^%&%*%(%)%=%_%.%,%:%;%\'%"%>%<%?%/%~%|%w%[%]%{%}%`%\\]') and
-					(not tonumber(event.char) or CtrlPressed)
+					(not tonumber(event.char) or CtrlPressed or IgnoreTabInput > 1)
 			 then
 				searchstring = searchstring .. event.char
 			end

@@ -139,6 +139,7 @@ t[#t + 1] =
 	{
 		InitCommand = function(self)
 			self:xy(frameWidth, frameY + offsetY - 9):zoom(0.6):halign(1)
+			self:diffuse(getMainColor("highlight2"))
 		end,
 		DisplaySinglePlaylistMessageCommand = function(self)
 			self:settext(translated_info["ExplainAdd"])
