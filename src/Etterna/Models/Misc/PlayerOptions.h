@@ -65,6 +65,8 @@ class PlayerOptions
 		ONE(m_SpeedfScrolls);
 		ZERO(m_bTurns);
 		ZERO(m_bTransforms);
+		ZERO(m_fConfusionZ);
+		ONE(m_SpeedfConfusionZ);
 	};
 	void Init();
 	void Approach(const PlayerOptions& other, float fDeltaSeconds);
@@ -127,6 +129,7 @@ class PlayerOptions
 		EFFECT_DRUNK,
 		EFFECT_DIZZY,
 		EFFECT_CONFUSION,
+		EFFECT_CONFUSION_OFFSET,
 		EFFECT_MINI,
 		EFFECT_TINY,
 		EFFECT_FLIP,
@@ -261,6 +264,8 @@ class PlayerOptions
 	bool m_bTransforms[NUM_TRANSFORMS]{};
 	bool m_bMuteOnError{ false };
 	bool m_bPractice{ false };
+
+	float m_fConfusionZ[16], m_SpeedfConfusionZ[16];
 	/** @brief The method for which a player can fail a song. */
 	FailType m_FailType{ FailType_Immediate };
 	TapNoteScore m_MinTNSToHideNotes;
@@ -295,5 +300,40 @@ class PlayerOptions
 								 Steps* pSteps,
 								 PlayerNumber pn) const -> bool;
 };
+
+#define ADD_MULTICOL_METHOD(method_name)                                       \
+	ADD_METHOD(method_name##1);                                                \
+	ADD_METHOD(method_name##2);                                                \
+	ADD_METHOD(method_name##3);                                                \
+	ADD_METHOD(method_name##4);                                                \
+	ADD_METHOD(method_name##5);                                                \
+	ADD_METHOD(method_name##6);                                                \
+	ADD_METHOD(method_name##7);                                                \
+	ADD_METHOD(method_name##8);                                                \
+	ADD_METHOD(method_name##9);                                                \
+	ADD_METHOD(method_name##10);                                               \
+	ADD_METHOD(method_name##11);                                               \
+	ADD_METHOD(method_name##12);                                               \
+	ADD_METHOD(method_name##13);                                               \
+	ADD_METHOD(method_name##14);                                               \
+	ADD_METHOD(method_name##15);                                               \
+	ADD_METHOD(method_name##16);
+#define MULTICOL_FLOAT_INTERFACE(func_name, member, valid)                     \
+	FLOAT_INTERFACE(func_name##1, member[0], valid);                           \
+	FLOAT_INTERFACE(func_name##2, member[1], valid);                           \
+	FLOAT_INTERFACE(func_name##3, member[2], valid);                           \
+	FLOAT_INTERFACE(func_name##4, member[3], valid);                           \
+	FLOAT_INTERFACE(func_name##5, member[4], valid);                           \
+	FLOAT_INTERFACE(func_name##6, member[5], valid);                           \
+	FLOAT_INTERFACE(func_name##7, member[6], valid);                           \
+	FLOAT_INTERFACE(func_name##8, member[7], valid);                           \
+	FLOAT_INTERFACE(func_name##9, member[8], valid);                           \
+	FLOAT_INTERFACE(func_name##10, member[9], valid);                          \
+	FLOAT_INTERFACE(func_name##11, member[10], valid);                         \
+	FLOAT_INTERFACE(func_name##12, member[11], valid);                         \
+	FLOAT_INTERFACE(func_name##13, member[12], valid);                         \
+	FLOAT_INTERFACE(func_name##14, member[13], valid);                         \
+	FLOAT_INTERFACE(func_name##15, member[14], valid);                         \
+	FLOAT_INTERFACE(func_name##16, member[15], valid);
 
 #endif

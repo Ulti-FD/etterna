@@ -99,6 +99,8 @@ PlayerOptions::Init()
 	m_bMuteOnError = false;
 	m_bPractice = false;
 	m_sNoteSkin = "";
+	ZERO(m_fConfusionZ);
+	ONE(m_SpeedfConfusionZ);
 }
 
 void
@@ -145,6 +147,8 @@ PlayerOptions::Approach(const PlayerOptions& other, float fDeltaSeconds)
 	DO_COPY(m_FailType);
 	DO_COPY(m_MinTNSToHideNotes);
 	DO_COPY(m_sNoteSkin);
+	for (int i = 0; i < 16; i++)
+		APPROACH(fConfusionZ[i]);
 #undef APPROACH
 #undef DO_COPY
 }
@@ -229,6 +233,7 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fEffects[EFFECT_DRUNK], "Drunk");
 	AddPart(AddTo, m_fEffects[EFFECT_DIZZY], "Dizzy");
 	AddPart(AddTo, m_fEffects[EFFECT_CONFUSION], "Confusion");
+	AddPart(AddTo, m_fEffects[EFFECT_CONFUSION_OFFSET], "ConfusionOffset");
 	AddPart(AddTo, m_fEffects[EFFECT_MINI], "Mini");
 	AddPart(AddTo, m_fEffects[EFFECT_TINY], "Tiny");
 	AddPart(AddTo, m_fEffects[EFFECT_FLIP], "Flip");
@@ -267,6 +272,11 @@ PlayerOptions::GetMods(vector<std::string>& AddTo, bool bForceNoteSkin) const
 	AddPart(AddTo, m_fPassmark, "Passmark");
 
 	AddPart(AddTo, m_fRandomSpeed, "RandomSpeed");
+
+	for (int i = 0; i < 16; i++) {
+		auto s = ssprintf("ConfusionZOffset%d", i + 1);
+		AddPart(AddTo, m_fConfusionZ[i], s);
+	}
 
 	if (m_bTurns[TURN_MIRROR])
 		AddTo.push_back("Mirror");
@@ -445,6 +455,7 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 			 "The Noteskin Manager must be loaded in order to process mods.");
 
 	auto sBit = make_lower(sOneMod);
+	std::string sMod = "";
 	Trim(sBit);
 
 	/* "drunk"
@@ -562,8 +573,21 @@ PlayerOptions::FromOneModString(const std::string& sOneMod,
 		SET_FLOAT(fEffects[EFFECT_DRUNK])
 	else if (sBit == "dizzy")
 		SET_FLOAT(fEffects[EFFECT_DIZZY])
-	else if (sBit == "confusion")
-		SET_FLOAT(fEffects[EFFECT_CONFUSION])
+	else if (sBit.find("confusion") != sBit.npos) {
+		if (sBit == "confusion")
+			SET_FLOAT(fEffects[EFFECT_CONFUSION])
+		else if (sBit == "confusionoffset")
+			SET_FLOAT(fEffects[EFFECT_CONFUSION_OFFSET])
+		else {
+			for (int i = 0; i < 16; i++) {
+				sMod = ssprintf("confusionoffset%d", i + 1);
+				if (sBit == sMod) {
+					SET_FLOAT(fConfusionZ[i])
+					break;
+				}
+			}
+		}
+	}
 	else if (sBit == "mini")
 		SET_FLOAT(fEffects[EFFECT_MINI])
 	else if (sBit == "tiny")
@@ -1015,6 +1039,8 @@ PlayerOptions::operator==(const PlayerOptions& other) const
 		COMPARE(m_bTurns[i]);
 	for (auto i = 0; i < PlayerOptions::NUM_TRANSFORMS; ++i)
 		COMPARE(m_bTransforms[i]);
+	for (int i = 0; i < 16; ++i)
+		COMPARE(m_fConfusionZ[i]);
 #undef COMPARE
 	return true;
 }
@@ -1068,6 +1094,9 @@ PlayerOptions::operator=(PlayerOptions const& other)
 	}
 	for (auto i = 0; i < PlayerOptions::NUM_TRANSFORMS; ++i) {
 		CPY(m_bTransforms[i]);
+	}
+		for (int i = 0; i < 16; ++i) {
+		CPY_SPEED(fConfusionZ[i]);
 	}
 #undef CPY
 #undef CPY_SPEED
@@ -1356,6 +1385,9 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	FLOAT_INTERFACE(Drunk, Effects[PlayerOptions::EFFECT_DRUNK], true);
 	FLOAT_INTERFACE(Dizzy, Effects[PlayerOptions::EFFECT_DIZZY], true);
 	FLOAT_INTERFACE(Confusion, Effects[PlayerOptions::EFFECT_CONFUSION], true);
+		FLOAT_INTERFACE(ConfusionOffset,
+					Effects[PlayerOptions::EFFECT_CONFUSION_OFFSET],
+					true);
 	FLOAT_INTERFACE(Mini, Effects[PlayerOptions::EFFECT_MINI], true);
 	FLOAT_INTERFACE(Tiny, Effects[PlayerOptions::EFFECT_TINY], true);
 	FLOAT_INTERFACE(Flip, Effects[PlayerOptions::EFFECT_FLIP], true);
@@ -1448,6 +1480,8 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 	BOOL_INTERFACE(PracticeMode, Practice)
 	ENUM_INTERFACE(FailSetting, FailType, FailType);
 	ENUM_INTERFACE(MinTNSToHideNotes, MinTNSToHideNotes, TapNoteScore);
+
+	MULTICOL_FLOAT_INTERFACE(ConfusionOffset, ConfusionZ, true);
 
 	// NoteSkins
 	static int NoteSkin(T* p, lua_State* L)
@@ -1830,6 +1864,10 @@ class LunaPlayerOptions : public Luna<PlayerOptions>
 		ADD_METHOD(GetInvalidatingMods);
 
 		ADD_METHOD(FromString);
+
+
+		ADD_METHOD(ConfusionOffset);
+		ADD_MULTICOL_METHOD(ConfusionOffset);
 	}
 };
 

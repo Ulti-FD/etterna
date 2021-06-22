@@ -74,8 +74,10 @@ class ArrowEffects
 	// EFFECT_DIZZY).
 	static auto GetRotationZ(const PlayerState* pPlayerState,
 							 float fNoteBeat,
-							 bool bIsHoldHead) -> float;
-	static auto ReceptorGetRotationZ(const PlayerState* pPlayerState) -> float;
+							 bool bIsHoldHead,
+							 int iCol) -> float;
+	static auto ReceptorGetRotationZ(const PlayerState* pPlayerState, int iCol)
+	  -> float;
 
 	// Due to the handling logic for holds on Twirl, we need to use an offset
 	// instead. It's more intuitive for Roll to be based off offset, so use an
