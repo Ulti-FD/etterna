@@ -29,6 +29,7 @@ local frameWidth = SCREEN_WIDTH - 20
 local frameHeight = SCREEN_HEIGHT - 40
 local squareWidth = 50
 local judgmentWidth = 125
+local judgmentHeight = 20
 local assetWidth = squareWidth
 local assetHeight = 50
 local assetXSpacing = (frameWidth + assetWidth/2) / (maxColumns + 1)
@@ -213,7 +214,7 @@ end
 local TAB = {
 	choices = {},
 	width = 100,
-	height = 20
+	height = 18
 }
 
 function TAB.new(self, choices)
@@ -230,9 +231,8 @@ function TAB.makeTabActors(tab)
 
 		t[#t+1] = Def.Quad {
 		InitCommand = function(self)
-			self:halign(0)
 			self:zoomto(tab.width, tab.height)
-			self:x(tab.width*(i-1))
+			self:x(tab.width*(i))
 			self:diffuse(color("#666666"))
 		end,
 		MouseLeftClickMessageCommand = function(self)
@@ -270,7 +270,7 @@ function TAB.makeTabActors(tab)
 
 		t[#t+1] = LoadFont("Common Large") .. {
 			InitCommand = function(self)
-				self:x((tab.width/2)+(tab.width*(i-1)))
+				self:xy(tab.width*(i),-1)
 				self:maxwidth(tab.width/0.25)
 				self:zoom(0.25)
 				self:settext(v)
@@ -288,7 +288,7 @@ local function assetBox(i)
         Name = tostring(i),
         InitCommand = function(self)
             self:x((((i-1) % maxColumns)+1)*assetXSpacing)
-            self:y(((math.floor((i-1)/maxColumns)+1)*assetYSpacing)-10+50)
+            self:y(((math.floor((i-1)/maxColumns)+1)*assetYSpacing)-10+30)
             self:diffusealpha(0)
         end,
         PageMovedMessageCommand = function(self)
@@ -311,8 +311,10 @@ local function assetBox(i)
 
 					if curType == 3 then
 						assetWidth = judgmentWidth
+						assetHeight = judgmentHeight
 					else
 						assetWidth = squareWidth
+						assetHeight = assetWidth
 					end
 
 					-- Load the asset image
@@ -330,12 +332,12 @@ local function assetBox(i)
 						self:GetChild("Border"):diffuse(getMainColor("positive")):diffusealpha(0)
 					end
 
-					self:y(((math.floor((i-1)/maxColumns)+1)*assetYSpacing)-10+50)
+					self:y(((math.floor((i-1)/maxColumns)+1)*assetYSpacing)-10+30)
 					self:finishtweening()
 					self:tween(0.5,"TweenType_Bezier",{0,0,0,0.5,0,1,1,1})
 					self:diffusealpha(1)
-					self:y((math.floor((i-1)/maxColumns)+1)*assetYSpacing+50)
-							
+					self:y((math.floor((i-1)/maxColumns)+1)*assetYSpacing+30)
+
 				end
             end
 		end,
@@ -350,7 +352,7 @@ local function assetBox(i)
 			end
 		end
 	}
-	
+
 	t[#t+1] = Def.Quad {
         Name = "SelectedAssetIndicator",
         InitCommand = function(self)
@@ -420,7 +422,7 @@ local function assetBox(i)
 			end
 		end
 	}
-    
+
     t[#t+1] = Def.Sprite {
         Name = "Image",
 		LoadAssetCommand = function(self)
@@ -453,7 +455,7 @@ local function assetBox(i)
 			end
 		end
 	}
-	
+
 	t[#t+1] = Def.Sound {
 		Name = "Sound",
 		LoadAssetCommand = function(self)
@@ -472,7 +474,7 @@ local function assetBox(i)
 			end
 		end
 	}
-    
+
     return t
 end
 
@@ -502,7 +504,7 @@ local function mainContainer()
             self:diffuse(color("#333333")):diffusealpha(0.8)
         end
 	}
-	
+
 	t[#t+1] = LoadFont("Common Large") .. {
 		InitCommand = function(self)
 			self:zoom(fontScale)
@@ -524,8 +526,9 @@ local function mainContainer()
 
 	t[#t+1] = LoadFont("Common Large") .. {
 		InitCommand = function(self)
-			self:zoom(smallFontScale)
-			self:xy(-frameWidth/2 + fontSpacing + 35, fontRow2 + 5)
+			self:zoom(fontScale)
+			self:halign(1)
+			self:xy(frameWidth/2 - fontSpacing * 2, fontRow1)
 			self:settext("")
 		end,
 		SetCommand = function(self)
@@ -546,15 +549,15 @@ local function mainContainer()
 		InitCommand = function(self)
 			self:zoom(smallFontScale)
 			self:halign(0)
-			self:xy(-frameWidth/2 + fontSpacing, frameHeight/2 - 15)
-			self:maxwidth((SCREEN_CENTER_X - TAB.width*#assetTypes/2 - 40)/smallFontScale)
+			self:xy(-fontSpacing, frameHeight/2 - 14)
+			self:maxwidth((frameWidth / 2 - fontSpacing)/smallFontScale)
 		end,
 		SetCommand = function(self)
 			local type = assetTable[getIndex()]
 			if type == nil then
-				self:settext("")
+				self:settext("Hovered:")
 			else
-				self:settext(type:gsub("^%l", string.upper))
+				self:settext("Hovered: " .. type:gsub("^%l", string.upper))
 			end
 		end,
 		CursorMovedMessageCommand = function(self)
@@ -570,15 +573,15 @@ local function mainContainer()
 		InitCommand = function(self)
 			self:zoom(smallFontScale)
 			self:halign(0)
-			self:xy(TAB.width*#assetTypes/2 + 15, frameHeight/2 - 15)
-			self:maxwidth((SCREEN_CENTER_X - TAB.width*#assetTypes/2 - 40)/smallFontScale)
+			self:xy(-fontSpacing, frameHeight/2 - 34)
+			self:maxwidth((frameWidth / 2 - fontSpacing)/smallFontScale)
 		end,
 		SetCommand = function(self)
 			local type = assetTable[selectedIndex]
 			if type == nil then
-				self:settext("")
+				self:settext("Selected:")
 			else
-				self:settext(type:gsub("^%l", string.upper))
+				self:settext("Selected: " .. type:gsub("^%l", string.upper))
 			end
 		end,
 		PickChangedMessageCommand = function(self)
@@ -688,7 +691,7 @@ local function input(event)
 			MESSAGEMAN:Broadcast("MouseLeftClick")
 		elseif event.DeviceInput.button == "DeviceButton_right mouse button" then
 			MESSAGEMAN:Broadcast("MouseRightClick")
-		
+
 		elseif event.DeviceInput.button == "DeviceButton_mousewheel up" and event.type == "InputEventType_FirstPress" then
 			movePage(-1)
 		elseif event.DeviceInput.button == "DeviceButton_mousewheel down" and event.type == "InputEventType_FirstPress" then
@@ -734,7 +737,7 @@ end
 local typeTabs = TAB:new(capTypes)
 t[#t+1] = typeTabs:makeTabActors() .. {
 	InitCommand = function(self)
-		self:xy(SCREEN_CENTER_X - TAB.width*#assetTypes/2, SCREEN_CENTER_Y + frameHeight/2 - TAB.height/2)
+		self:xy(SCREEN_CENTER_X - frameWidth/2, SCREEN_CENTER_Y + frameHeight/2 - TAB.height/2)
 	end
 }
 
