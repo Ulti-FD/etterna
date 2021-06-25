@@ -29,11 +29,13 @@ end
 local function highlight(self)
 	self:GetChild("refreshbutton"):queuecommand("Highlight")
 	self:GetChild("Name"):queuecommand("Highlight")
+	self:GetChild("Version"):queuecommand("Highlight")
 end
 
 local function highlight2(self)
 	self:GetChild("refreshbutton"):queuecommand("Highlight")
 	self:GetChild("Name"):queuecommand("Highlight")
+	self:GetChild("Version"):queuecommand("Highlight")
 	self:GetChild("loginlogout"):queuecommand("Highlight")
 end
 
@@ -404,6 +406,7 @@ t[#t + 1] =
 		},
 	LoadFont("Common Normal") ..
 		{
+			Name = "Version",
 			InitCommand = function(self)
 				self:xy(SCREEN_WIDTH - 3, AvatarY + 8):halign(1):zoom(0.42):diffuse(getMainColor("positive"))
 			end,
@@ -412,6 +415,15 @@ t[#t + 1] =
 			end,
 			SetCommand = function(self)
 				self:settext(GAMESTATE:GetEtternaVersion())
+			end,
+			HighlightCommand=function(self)
+				highlightIfOver(self)
+			end,
+			MouseLeftClickMessageCommand=function(self)
+				local tag = "urlnoexit,https://github.com/etternagame/etterna/releases/tag/v" .. GAMESTATE:GetEtternaVersion()
+				if isOver(self) then
+					GAMESTATE:ApplyGameCommand(tag)
+				end
 			end
 		},
 	LoadFont("Common Normal") .. {
