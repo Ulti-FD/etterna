@@ -1,3 +1,42 @@
+local function genericHighlight(self, highlight, base, clickaction)
+	local highlight = highlight or 0.6
+	local base = base or 1
+	self:SetUpdateFunction(function(self)
+		if self:IsVisible() then
+			self:RunCommandsOnChildren(
+				function(self)
+					if isOver(self) and self:getaux() ~= 1 then
+						self:diffusealpha(highlight)
+					else
+						self:diffusealpha(base)
+					end
+				end
+				)
+			end
+		end
+	)
+	self:SetUpdateFunctionInterval(0.025)
+	if clickaction then
+		self:RunCommandsOnChildren(
+			function(self)
+				self:addcommand("LeftClickMessage", clickaction)
+			end
+		)
+	end
+end
+local function highlight(self)
+	if self:IsVisible() then
+		self:queuecommand("Highlight")
+	end
+end
+local function highlightIfOver(self)
+	if isOver(self) then
+		self:diffusealpha(0.6)
+	else
+		self:diffusealpha(1)
+	end
+end
+
 local onTab = false
 local song
 local steps
@@ -130,8 +169,9 @@ t[#t + 1] =
 	LoadFont("Common Normal") ..
 	{
 		InitCommand = function(self)
-			self:xy(frameX + 5, frameY + offsetY - 9):zoom(0.6):halign(0):diffuse(getMainColor("positive"))
+			self:xy(frameX + 5, frameY + offsetY - 9):zoom(0.6):halign(0)
 			self:settext(translated_info["Title"])
+			self:diffuse(Saturation(getMainColor("positive"), 0.1))
 		end
 	}
 
@@ -174,7 +214,7 @@ local r =
 		if filterChanged then
 			charts = {}
 			oCharts = {}
-			
+
 			if next(filterTags) then
 				-- MODE == AND in menu, requires all tags to be active
 				if filterMode then
@@ -248,7 +288,7 @@ local r =
 			whee:SelectSong(ssong)
 			filterChanged = false
 		end
-		
+
 
 		playertags = {}
 		for k, v in pairs(ptags) do
@@ -388,6 +428,7 @@ local function funcButton(i)
 			local colPos = (i - 1) * (frameWidth / 3 - 5) + 80
 			self:xy(colPos, frameY + capWideScale(80, 80) - 55)
 			self:visible(true)
+			self:SetUpdateFunction(highlight):SetUpdateFunctionInterval(0.025)
 		end,
 		Def.Quad {
 			InitCommand = function(self)
@@ -417,7 +458,10 @@ local function funcButton(i)
 				end,
 				BeginCommand = function(self)
 					self:settext(fawa[i])
-				end
+				end,
+				HighlightCommand = function(self)
+					highlightIfOver(self)
+				end,
 			}
 	}
 	return t
@@ -569,46 +613,38 @@ r[#r + 1] =
 r[#r + 1] =
 	Def.ActorFrame {
 	InitCommand = function(self)
-		self:xy(frameX + 10, frameY + capWideScale(80, 80) + 250)
+		self:xy(frameX + 28, frameY + capWideScale(80, 80) + 253)
+		genericHighlight(self)
 	end,
-	Def.Quad {
-		InitCommand = function(self)
-			self:xy(300, -8):zoomto(40, 20):halign(0):valign(0):diffuse(getMainColor("frames")):diffusealpha(buttondiffuse)
-		end,
-		MouseLeftClickMessageCommand = function(self)
-			if isOver(self) and currenttagpage < numtagpages then
-				currenttagpage = currenttagpage + 1
-				MESSAGEMAN:Broadcast("RefreshTags")
-			end
-		end
-	},
-	LoadFont("Common Large") ..
-		{
-			InitCommand = function(self)
-				self:x(300):halign(0):zoom(0.3):diffuse(getMainColor("positive")):settext(translated_info["Next"])
-			end
-		},
-	Def.Quad {
-		InitCommand = function(self)
-			self:y(-8):zoomto(65, 20):halign(0):valign(0):diffuse(getMainColor("frames")):diffusealpha(buttondiffuse)
-		end,
-		MouseLeftClickMessageCommand = function(self)
-			if isOver(self) and currenttagpage > 1 then
-				currenttagpage = currenttagpage - 1
-				MESSAGEMAN:Broadcast("RefreshTags")
-			end
-		end
-	},
 	LoadFont("Common Large") ..
 		{
 			InitCommand = function(self)
 				self:halign(0):zoom(0.3):diffuse(getMainColor("positive")):settext(translated_info["Previous"])
+			end,
+			MouseLeftClickMessageCommand = function(self)
+				if isOver(self) and currenttagpage > 1 then
+					currenttagpage = currenttagpage - 1
+					MESSAGEMAN:Broadcast("RefreshTags")
+				end
 			end
 		},
 	LoadFont("Common Large") ..
 		{
 			InitCommand = function(self)
-				self:x(175):halign(0.5):zoom(0.3):diffuse(getMainColor("positive"))
+				self:x(300):halign(0):zoom(0.3):diffuse(getMainColor("positive")):settext(translated_info["Next"])
+			end,
+			MouseLeftClickMessageCommand = function(self)
+				if isOver(self) and currenttagpage < numtagpages then
+					currenttagpage = currenttagpage + 1
+					MESSAGEMAN:Broadcast("RefreshTags")
+				end
+			end
+		},
+	LoadFont("Common Large") ..
+		{
+			InitCommand = function(self)
+				self:x(175):halign(0.5):zoom(0.3)
+				self:aux(1)
 			end,
 			BORPBORPNORFNORFcCommand = function(self)
 				self:settextf(

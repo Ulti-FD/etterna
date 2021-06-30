@@ -116,7 +116,8 @@ local f =
 	LoadFont("Common Normal") ..
 		{
 			InitCommand = function(self)
-				self:xy(5, offsetY - 9):zoom(0.6):halign(0):diffuse(getMainColor("highlight2")):settext(translated_info["Title"])
+				self:xy(5, offsetY - 9):zoom(0.6):halign(0):settext(translated_info["Title"])
+				self:diffuse(Saturation(getMainColor("positive"), 0.1))
 			end
 		},
 	OnCommand = function(self)

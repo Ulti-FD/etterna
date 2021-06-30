@@ -338,7 +338,11 @@ t[#t + 1] =
 			)
 		end,
 		MintyFreshCommand = function(self)
-			self:settext(getCurRateDisplayString())
+			if song then
+				self:settext(getCurRateDisplayString())
+			else
+				self:settext("")
+			end
 		end,
 		CodeMessageCommand = function(self, params)
 			local rate = getCurRateValue()
@@ -971,6 +975,12 @@ t[#t + 1] =
 			else
 				self:settext("")
 			end
+		end,
+		ChartPreviewOnMessageCommand = function(self)
+			self:visible(false)
+		end,
+		ChartPreviewOffMessageCommand = function(self)
+			self:visible(true)
 		end
 	}
 
@@ -1046,7 +1056,6 @@ t[#t + 1] = Def.ActorFrame {
 		SCREENMAN:GetTopScreen():AddInputCallback(MPinput)
 		SCREENMAN:GetTopScreen():AddInputCallback(ihatestickinginputcallbackseverywhere)
 		self:xy(20, 235):zoom(0.5):halign(0)
-		self:settext(translated_info["TogglePreview"])
 		self:diffuse(getMainColor("positive"))
 	end,
 	MouseLeftClickMessageCommand = function(self)
@@ -1077,6 +1086,13 @@ t[#t + 1] = Def.ActorFrame {
 	end,
 	HighlightCommand=function(self)
 		highlightIfOver(self)
+	end,
+	MintyFreshCommand = function(self)
+		if song then
+			self:settext(translated_info["TogglePreview"])
+		else
+			self:settext("")
+		end
 	end,
 	},
 

@@ -130,7 +130,7 @@ t[#t + 1] =
 	{
 		InitCommand = function(self)
 			self:xy(frameX + 5, frameY + offsetY - 9):zoom(0.6):halign(0)
-			self:diffuse(getMainColor("highlight2"))
+			self:diffuse(Saturation(getMainColor("positive"), 0.1))
 			self:settext(translated_info["Title"])
 		end
 	}
@@ -139,7 +139,7 @@ t[#t + 1] =
 	{
 		InitCommand = function(self)
 			self:xy(frameWidth, frameY + offsetY - 9):zoom(0.6):halign(1)
-			self:diffuse(getMainColor("highlight2"))
+			self:diffuse(Saturation(getMainColor("positive"), 0.1))
 		end,
 		DisplaySinglePlaylistMessageCommand = function(self)
 			self:settext(translated_info["ExplainAdd"])
@@ -195,7 +195,7 @@ local r =
 	LoadFont("Common Large") ..
 		{
 			InitCommand = function(self)
-				self:xy(frameX, rankingY):zoom(0.4):halign(0):maxwidth(460)
+				self:xy(frameX, rankingY):zoom(0.4):halign(0):maxwidth(capWideScale(460,500))
 			end,
 			DisplaySinglePlaylistMessageCommand = function(self)
 				pl = SONGMAN:GetActivePlaylist()
@@ -605,7 +605,7 @@ local function PlaylistTitleDisplayButton(i)
 			{
 				Name = "Text",
 				InitCommand = function(self)
-					self:halign(0):maxwidth(frameWidth * 3 + 140)
+					self:halign(0):maxwidth(frameWidth * 3 + capWideScale(100, -20))
 					self:diffuse(getMainColor("positive"))
 				end,
 				AllDisplayMessageCommand = function(self)
@@ -818,7 +818,8 @@ r[#r + 1] =
 	LoadFont("Common Large") ..
 		{
 			InitCommand = function(self)
-				self:x(175):halign(0.5):zoom(0.3):diffuse(getMainColor("positive"))
+				self:x(175):halign(0.5):zoom(0.3)
+				self:aux(1)
 			end,
 			SetCommand = function(self)
 				self:settextf(

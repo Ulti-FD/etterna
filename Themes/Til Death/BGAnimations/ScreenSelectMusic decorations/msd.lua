@@ -12,7 +12,7 @@ local offsetX = 10
 local offsetY = 20
 local pn = GAMESTATE:GetEnabledPlayers()[1]
 local greatest = 0
-local txtDist = 27
+local txtDist = 29
 local steps
 local meter = {}
 meter[1] = 0.00
@@ -30,7 +30,7 @@ local t =
 	Def.ActorFrame {
 	BeginCommand = function(self)
 		cd = self:GetChild("ChordDensityGraph")
-		cd:xy(frameX + offsetX, frameY + 140):visible(false)
+		cd:xy(frameX + offsetX, frameY + 122):visible(false)
 		self:queuecommand("Set"):visible(false)
 	end,
 	OffCommand = function(self)
@@ -95,10 +95,17 @@ t[#t + 1] =
 local function littlebits(i)
 	local t =
 		Def.ActorFrame {
+			SetCommand = function(self)
+				if GAMESTATE:GetCurrentStyle():ColumnsPerPlayer() ~= 4 and i ~= 1 then
+					self:visible(0)
+				else
+					self:visible(1)
+				end
+			end,
 		LoadFont("Common Large") ..
 			{
 				InitCommand = function(self)
-					self:xy(frameX + offsetX, frameY + 120 + txtDist * i):halign(0):valign(0):zoom(0.5):maxwidth(160 / 0.6)
+					self:xy(frameX + offsetX, frameY + 100 + txtDist * i):halign(0):valign(0):zoom(0.5):maxwidth(160 / 0.6)
 				end,
 				SetCommand = function(self)
 					--skillset name
@@ -109,8 +116,8 @@ local function littlebits(i)
 					end
 					--highlight
 					if greatest == i then
-						self:diffusetopedge(getMainColor("highlight"))
-						self:diffusebottomedge(getMainColor("positive"))
+						self:diffusetopedge(Saturation(getMainColor("highlight"), 0.5))
+						self:diffusebottomedge(Saturation(getMainColor("positive"), 0.6))
 					end
 					--If negative BPM empty label
 					if steps and steps:GetTimingData():HasWarps() then
@@ -121,7 +128,7 @@ local function littlebits(i)
 		LoadFont("Common Large") ..
 			{
 				InitCommand = function(self)
-					self:xy(frameX + 225, frameY + 120 + txtDist * i):halign(1):valign(0):zoom(0.5):maxwidth(110 / 0.6)
+					self:xy(frameX + 220, frameY + 100 + txtDist * i):halign(1):valign(0):zoom(0.5):maxwidth(110 / 0.6)
 				end,
 				SetCommand = function(self)
 					if song and steps then
@@ -144,24 +151,25 @@ end
 t[#t + 1] =
 	Def.Quad {
 	InitCommand = function(self)
-		self:xy(frameX, frameY):zoomto(frameWidth, offsetY):halign(0):valign(0):diffuse(getMainColor("frames")):diffusealpha(
-			0.5
-		)
+		self:xy(frameX, frameY):zoomto(frameWidth, offsetY):halign(0):valign(0):diffuse(getMainColor("frames"))
+		self:diffusealpha(0.5)
 	end
 }
 t[#t + 1] =
 	LoadFont("Common Normal") .. {
 		InitCommand = function(self)
-			self:xy(frameX + offsetX/2, frameY + offsetY - 11):zoom(0.65):halign(0):diffuse(getMainColor("highlight2"))
+			self:xy(frameX + offsetX/2, frameY + offsetY - 11):zoom(0.65):halign(0)
 			self:settext(translated_text["Title"])
+			self:diffuse(Saturation(getMainColor("positive"), 0.1))
 		end
 	}
 t[#t + 1] =
 	LoadFont("Common Large") .. {
 		InitCommand = function(self)
-			self:xy(frameX + offsetX, frameY + 35):zoom(0.6):halign(0):diffuse(getMainColor("positive")):maxwidth(
-				SCREEN_CENTER_X / 0.7
-			)
+			self:xy(frameX + offsetX, frameY + 35):zoom(0.6):halign(0):diffuse(getMainColor("positive"))
+			self:maxwidth(SCREEN_CENTER_X / 0.7)
+			self:diffusetopedge(Saturation(getMainColor("highlight"), 0.5))
+			self:diffusebottomedge(Saturation(getMainColor("positive"), 0.6))
 		end,
 		SetCommand = function(self)
 			if song then
@@ -174,15 +182,17 @@ t[#t + 1] =
 
 -- Music Rate Display
 t[#t + 1] =
-	LoadFont("Common Large") ..
+	LoadFont("Common Normal") ..
 	{
 		InitCommand = function(self)
-			self:xy(frameX + offsetX, frameY + offsetY + 62):visible(true):halign(0):zoom(0.4):maxwidth(
-				capWideScale(get43size(360), 360) / capWideScale(get43size(0.45), 0.45)
-			)
+			self:xy(frameX + capWideScale(290,310), frameY + 123):visible(true):align(1,0):zoom(0.5)
 		end,
 		SetCommand = function(self)
-			self:settext(getCurRateDisplayString())
+			if steps then
+				self:settext(getCurRateDisplayString())
+			else
+				self:settext("")
+			end
 		end
 	}
 
@@ -203,6 +213,8 @@ t[#t + 1] =
 					self:settext(stype .. " " .. diff .. " " .. meter)
 					self:diffuse(getDifficultyColor(GetCustomDifficulty(steps:GetStepsType(), steps:GetDifficulty())))
 				end
+			else
+				self:settext("")
 			end
 		end
 	}
@@ -225,7 +237,7 @@ t[#t + 1] =
 				self:settextf("%0.2f %s", notecount / length * getCurRateValue(), translated_text["AverageNPS"])
 				self:diffuse(Saturation(getDifficultyColor(GetCustomDifficulty(steps:GetStepsType(), steps:GetDifficulty())), 0.3))
 			else
-				self:settextf("0.00 %s", translated_text["AverageNPS"])
+				self:settext("")
 			end
 		end
 	}
@@ -234,7 +246,7 @@ t[#t + 1] =
 t[#t + 1] =
 	LoadFont("Common Large") .. {
 		InitCommand = function(self)
-			self:xy(frameX + 45, frameY + 165):zoom(0.5):halign(0):diffuse(getMainColor("negative")):settext("Negative Bpms")
+			self:xy(frameX + 45, frameY + 165):zoom(0.5):halign(0):diffuse(getMainColor("negative")):settext("Negative BPMs")
 		end,
 		SetCommand = function(self)
 			if steps and steps:GetTimingData():HasWarps() then
@@ -244,6 +256,20 @@ t[#t + 1] =
 			end
 		end
 	}
+--not 4key warning
+t[#t + 1] =
+	LoadFont("Common Large") .. {
+		InitCommand = function(self)
+			self:xy(frameX + 78, frameY + 250):zoom(0.4):halign(0):diffusealpha(0.4)
+		end,
+		SetCommand = function(self)
+			self:settext("")
+			if steps and GAMESTATE:GetCurrentStyle():ColumnsPerPlayer() ~= 4 then
+				self:settext("Not 4Key")
+			end
+		end
+	}
+
 
 --Skillset labels
 for i = 1, #ms.SkillSets do
